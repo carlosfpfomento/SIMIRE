@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Horario</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    min-height: 100vh;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ MENÚ ============ */
+  .menu-toggle {
+    position: fixed; top: 20px; right: 24px; z-index: 300;
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .menu-toggle .bars span { display: block; height: 2px; width: 100%; background: #111; transition: all 0.3s; transform-origin: center; }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 200; background: #fff;
+    padding: 100px 48px 48px; display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; transform: translateY(-16px);
+    transition: opacity 0.35s, transform 0.35s, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .menu-header { position: absolute; top: 30px; left: 48px; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #bbb; }
+  .menu-body { max-width: 900px; width: 100%; margin: auto; display: flex; flex-direction: column; justify-content: center; flex: 1; }
+  .menu-list { list-style: none; display: flex; flex-direction: column; }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+  .menu-list li a { display: grid; grid-template-columns: 70px 1fr auto; align-items: baseline; gap: 24px; padding: 22px 0; width: 100%; text-align: left; transition: padding-left 0.3s, color 0.25s; }
+  .menu-list li a:hover { padding-left: 16px; color: #888; outline: none; }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc { font-size: 13px; color: #999; font-family: system-ui, sans-serif; text-align: right; max-width: 280px; }
+  .menu-footer { max-width: 900px; width: 100%; margin: 40px auto 0; font-size: 11px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* ============ PÁGINA COMPACTA ============ */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 90px 20px 40px;
+  }
+
+  /* ============ BARRA EN VIVO (CUENTA ATRÁS) ============ */
+  .live-status {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .live-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .live-title {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+  }
+  .live-countdown {
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #111;
+    background: #f4f4f2;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-variant-numeric: tabular-nums;
+  }
+  .live-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .live-now {
+    font-size: 16px;
+    font-weight: 500;
+    color: #111;
+    line-height: 1.2;
+  }
+  .live-next {
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+  }
+  .live-next strong { color: #111; font-weight: 600; }
+  
+  .progress-container {
+    height: 4px;
+    background: #f0f0f0;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: #888;
+    width: 0%;
+    border-radius: 99px;
+    transition: width 1s linear;
+  }
+
+  /* ============ VISTA PC (TABLA COMPACTA) ============ */
+  .desktop-view {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+
+  .schedule-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+    table-layout: fixed;
+  }
+  .schedule-table th {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 600;
+    padding: 6px 0;
+    text-align: center;
+  }
+  .schedule-table th.time-col {
+    width: 65px;
+    text-align: left;
+    padding-left: 6px;
+  }
+  
+  .time-cell {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #888;
+    padding: 6px !important;
+    text-align: left;
+    vertical-align: middle;
+    border-top: 1px solid #f0f0f0;
+    white-space: nowrap;
+  }
+
+  .class-block {
+    background: #fafaf8;
+    border: 1px solid #ececea;
+    border-radius: 8px;
+    padding: 6px 10px;
+    height: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  .class-block-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: #111;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .class-block-teacher {
+    font-family: system-ui, sans-serif;
+    font-size: 9px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Estados: Clase Actual y Siguiente */
+  .class-block.is-now {
+    background: #fff;
+    border-color: #ececea;
+    border-left: 3px solid #111;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+  }
+  .class-block.is-now .class-block-name { color: #111; font-weight: 600; }
+
+  .class-block.is-next {
+    background: #fdfdfd;
+    border-color: #ddd;
+    border-left: 3px solid #aaa;
+  }
+
+  .recreo-block {
+    background: #fafaf8;
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    color: #999;
+    font-family: system-ui, sans-serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .recreo-block.is-now {
+    background: #fff;
+    border-left: 3px solid #111;
+    border-style: solid;
+    border-color: #ececea;
+    border-left-color: #111;
+    color: #111;
+  }
+
+  .empty-cell {
+    background: #fbfbf9;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    height: 52px;
+    opacity: 0.5;
+  }
+
+  /* ============ VISTA MÓVIL (APP) ============ */
+  .mobile-view { display: none; }
+  
+  .mobile-header {
+    position: sticky;
+    top: 0;
+    background: #fafaf8;
+    z-index: 10;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+
+  .mobile-day-selector {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 4px 0;
+    scrollbar-width: none;
+  }
+  .mobile-day-selector::-webkit-scrollbar { display: none; }
+  
+  /* Días solo con texto */
+  .day-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 12px;
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: capitalize;
+    transition: all 0.2s;
+  }
+  
+  .day-btn.is-active {
+    background: #111;
+    border-color: #111;
+    color: #fff;
+  }
+
+  .mobile-class-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 20px;
+  }
+
+  .mobile-class-item {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .mobile-class-time {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    width: 40px;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+
+  .mobile-class-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .mobile-class-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111;
+    line-height: 1.2;
+  }
+  
+  .mobile-class-teacher {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    color: #888;
+  }
+
+  .mobile-class-item.is-recreo {
+    background: #fafaf8;
+    border-style: dashed;
+    justify-content: center;
+    padding: 10px;
+    color: #999;
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: none;
+  }
+
+  /* Estados dinámicos en móvil */
+  .mobile-class-item.is-now {
+    border-left: 3px solid #111;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+  }
+  .mobile-class-item.is-now .mobile-class-name { font-weight: 600; }
+  
+  .mobile-class-item.is-next {
+    background: #fdfdfd;
+    border-left: 3px solid #aaa;
+  }
+
+  /* Barra de progreso LATERAL en la tarjeta actual (Móvil) */
+  .mobile-class-progress {
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 0%;
+    background: #111;
+    opacity: 0.2;
+    transition: height 1s linear;
+  }
+
+  .empty-state, .error-state {
+    padding: 30px 20px;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    color: #999;
+    background: #fff;
+    border: 1px dashed #e2e2e2;
+    border-radius: 12px;
+  }
+  .error-state { color: #c0392b; border-color: #f5b8af; background: #fef6f5; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; }
+    .menu-list li a { grid-template-columns: 40px 1fr; gap: 14px; padding: 18px 0; align-items: center; }
+    .menu-list .desc { display: none; }
+    .menu-list .label { font-size: clamp(24px, 7vw, 36px); }
+    .menu-footer { flex-direction: column; align-items: flex-start; }
+    
+    .page { padding: 76px 14px 20px; }
+    
+    .live-status { padding: 12px 14px; margin-bottom: 12px; }
+    .live-content { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .live-now { font-size: 15px; }
+    .live-next { text-align: left; font-size: 11px; }
+  }
+
+  @media (max-width: 768px) {
+    .desktop-view { display: none; }
+    .mobile-view { display: block; }
+  }
+</style>
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+    <span class="bars"><span></span><span></span><span></span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Exámenes</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Lista</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Compañeros</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Velocidad</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Números</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Juego</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Palabras</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+    <div class="live-status" id="liveStatus" style="display:none;">
+      <div class="live-header">
+        <span class="live-title">En directo</span>
+        <span class="live-countdown" id="liveCountdown">--:--</span>
+      </div>
+      <div class="live-content">
+        <div class="live-now" id="liveNow">Cargando...</div>
+        <div class="live-next" id="liveNext"></div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="liveBar"></div>
+      </div>
+    </div>
+
+    <div id="errorBox" class="error-state" hidden></div>
+
+    <div class="desktop-view" id="desktopView"></div>
+
+    <div class="mobile-view" id="mobileView">
+      <div class="mobile-header">
+        <div class="mobile-day-selector" id="mobileDaySelector"></div>
+      </div>
+      <ul class="mobile-class-list" id="mobileClassList"></ul>
+    </div>
+  </div>
+
+<script>
+  const toggle = document.getElementById('menuToggle');
+  const body = document.body;
+  toggle.addEventListener('click', () => body.classList.toggle('menu-open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) body.classList.remove('menu-open');
+  });
+
+  const TXT_URL = 'horario/horario.txt';
+  const desktopView = document.getElementById('desktopView');
+  const mobileDaySelector = document.getElementById('mobileDaySelector');
+  const mobileClassList = document.getElementById('mobileClassList');
+  const errorBox = document.getElementById('errorBox');
+
+  const liveStatus = document.getElementById('liveStatus');
+  const liveNow = document.getElementById('liveNow');
+  const liveNext = document.getElementById('liveNext');
+  const liveCountdown = document.getElementById('liveCountdown');
+  const liveBar = document.getElementById('liveBar');
+
+  const DAYS_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  let scheduleData = {};
+  let selectedMobileDay = '';
+  let tickInterval = null;
+
+  function parseBlock(text) {
+    const data = {};
+    const lines = text.split(/\r?\n/);
+    let key = null, val = [];
+    lines.forEach(line => {
+      const m = line.match(/^([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)\s*:\s*(.*)$/);
+      if (m) {
+        if (key) data[key] = val.join('\n').trim();
+        key = m[1].toLowerCase();
+        val = [m[2]];
+      } else if (key && line.trim() !== '') {
+        val.push(line);
+      }
+    });
+    if (key) data[key] = val.join('\n').trim();
+    return data;
+  }
+
+  function parseHorarioText(text) {
+    return text.replace(/\r\n/g, '\n').split(/^\s*---\s*$/m).map(b => b.trim()).filter(b => b.length > 0).map(parseBlock);
+  }
+
+  function getTodayName() {
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return days[new Date().getDay()];
+  }
+
+  function timeToMs(timeStr) {
+    if (!timeStr) return null;
+    const [h, m] = timeStr.split(':').map(Number);
+    return (h * 60 + m) * 60 * 1000;
+  }
+
+  function formatTime(ms) {
+    if (ms < 0) ms = 0;
+    const totalSec = Math.floor(ms / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  async function loadHorario() {
+    try {
+      const res = await fetch(`${TXT_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const blocks = parseHorarioText(text);
+
+      errorBox.hidden = true;
+
+      if (blocks.length === 0) {
+        desktopView.innerHTML = '<div class="empty-state">El archivo horario.txt está vacío.</div>';
+        return;
+      }
+
+      scheduleData = {};
+      blocks.forEach(b => {
+        const dia = b.dia || 'Sin día';
+        if (!scheduleData[dia]) scheduleData[dia] = [];
+        scheduleData[dia].push(b);
+      });
+
+      Object.keys(scheduleData).forEach(dia => {
+        scheduleData[dia].sort((a, b) => {
+          const hA = (a.hora || '').split(' - ')[0];
+          const hB = (b.hora || '').split(' - ')[0];
+          return hA.localeCompare(hB);
+        });
+      });
+
+      liveStatus.style.display = 'flex';
+      renderDesktop();
+      renderMobile();
+      
+      if (tickInterval) clearInterval(tickInterval);
+      updateLive();
+      tickInterval = setInterval(updateLive, 1000);
+
+    } catch (e) {
+      errorBox.hidden = false;
+      errorBox.textContent = 'No se pudo cargar horario/horario.txt. Asegúrate de usar un servidor local.';
+    }
+  }
+
+  function updateLive() {
+    const now = new Date();
+    const today = getTodayName();
+    
+    document.querySelectorAll('.is-now, .is-next').forEach(el => el.classList.remove('is-now', 'is-next'));
+
+    if (!DAYS_ORDER.includes(today) || !scheduleData[today]) {
+      liveNow.textContent = 'Hoy no hay clases';
+      liveNext.textContent = '';
+      liveCountdown.textContent = '--:--';
+      liveBar.style.width = '0%';
+      return;
+    }
+
+    const nowMs = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000 + now.getMilliseconds();
+    const classes = scheduleData[today];
+    
+    let currentClass = null;
+    let currentIndex = -1;
+
+    for (let i = 0; i < classes.length; i++) {
+      const c = classes[i];
+      const times = (c.hora || '').split(' - ');
+      if (times.length === 2) {
+        const start = timeToMs(times[0]);
+        const end = timeToMs(times[1]);
+        if (nowMs >= start && nowMs < end) {
+          currentClass = c;
+          currentIndex = i;
+          currentClass.startMs = start;
+          currentClass.endMs = end;
+          break;
+        }
+      }
+    }
+
+    if (currentClass) {
+      const isRecreo = (currentClass.asignatura || '').toUpperCase().includes('RECREO');
+      liveNow.textContent = isRecreo ? 'Recreo ☕' : currentClass.asignatura;
+      
+      const duration = currentClass.endMs - currentClass.startMs;
+      const elapsed = nowMs - currentClass.startMs;
+      const remaining = currentClass.endMs - nowMs;
+      
+      // Cuenta atrás
+      liveCountdown.textContent = formatTime(remaining);
+      liveBar.style.width = Math.min(100, Math.max(0, (elapsed / duration) * 100)) + '%';
+
+      if (currentIndex + 1 < classes.length) {
+        const nextC = classes[currentIndex + 1];
+        const nextTime = (nextC.hora || '').split(' - ')[0];
+        liveNext.innerHTML = `Siguiente: <strong>${escapeHtml(nextC.asignatura)}</strong> a las ${nextTime}`;
+      } else {
+        liveNext.innerHTML = 'No hay más clases hoy';
+      }
+    } else {
+      liveNow.textContent = 'Sin clase ahora mismo';
+      liveNext.innerHTML = '';
+      liveCountdown.textContent = '--:--';
+      liveBar.style.width = '0%';
+
+      for (let i = 0; i < classes.length; i++) {
+        const start = timeToMs((classes[i].hora || '').split(' - ')[0]);
+        if (start > nowMs) {
+          liveNext.innerHTML = `Siguiente: <strong>${escapeHtml(classes[i].asignatura)}</strong> a las ${classes[i].hora.split(' - ')[0]}`;
+          break;
+        }
+      }
+    }
+
+    if (currentIndex !== -1) {
+      const nowBlock = document.querySelector(`.desktop-view [data-idx="${currentIndex}"]`);
+      if (nowBlock) nowBlock.classList.add('is-now');
+      
+      const nextBlock = document.querySelector(`.desktop-view [data-idx="${currentIndex + 1}"]`);
+      if (nextBlock) nextBlock.classList.add('is-next');
+    }
+
+    if (currentIndex !== -1) {
+      const mobileNowBlock = document.querySelector(`.mobile-view [data-idx="${currentIndex}"]`);
+      if (mobileNowBlock) {
+        mobileNowBlock.classList.add('is-now');
+        
+        // Barra lateral interna en móvil
+        let innerBar = mobileNowBlock.querySelector('.mobile-class-progress');
+        if (!innerBar) {
+          innerBar = document.createElement('div');
+          innerBar.className = 'mobile-class-progress';
+          mobileNowBlock.appendChild(innerBar);
+        }
+        const duration = currentClass.endMs - currentClass.startMs;
+        const elapsed = nowMs - currentClass.startMs;
+        innerBar.style.height = Math.min(100, Math.max(0, (elapsed / duration) * 100)) + '%';
+      }
+      
+      const mobileNextBlock = document.querySelector(`.mobile-view [data-idx="${currentIndex + 1}"]`);
+      if (mobileNextBlock) mobileNextBlock.classList.add('is-next');
+    }
+  }
+
+  function renderDesktop() {
+    const allTimes = new Set();
+    Object.values(scheduleData).forEach(classes => {
+      classes.forEach(c => { if (c.hora) allTimes.add(c.hora); });
+    });
+    const sortedTimes = Array.from(allTimes).sort((a, b) => a.split(' - ')[0].localeCompare(b.split(' - ')[0]));
+
+    let html = `<table class="schedule-table">
+      <thead>
+        <tr>
+          <th class="time-col">Hora</th>`;
+    DAYS_ORDER.forEach(dia => { html += `<th>${dia}</th>`; });
+    html += `</tr></thead><tbody>`;
+
+    sortedTimes.forEach(time => {
+      html += `<tr><td class="time-cell">${time.replace(' - ', '<br>')}</td>`;
+      DAYS_ORDER.forEach(dia => {
+        const classes = scheduleData[dia] || [];
+        const idx = classes.findIndex(c => c.hora === time);
+        
+        if (idx !== -1) {
+          const clase = classes[idx];
+          const isRecreo = (clase.asignatura || '').toUpperCase().includes('RECREO');
+          
+          if (isRecreo) {
+            html += `<td><div class="recreo-block" data-idx="${idx}">${clase.asignatura}</div></td>`;
+          } else {
+            html += `<td>
+              <div class="class-block" data-idx="${idx}">
+                <span class="class-block-name">${escapeHtml(clase.asignatura || '')}</span>
+                <span class="class-block-teacher">${escapeHtml(clase.profesor || '')}</span>
+              </div>
+            </td>`;
+          }
+        } else {
+          html += `<td><div class="empty-cell"></div></td>`;
+        }
+      });
+      html += `</tr>`;
+    });
+    html += `</tbody></table>`;
+    desktopView.innerHTML = html;
+  }
+
+  function renderMobile() {
+    if (!selectedMobileDay) {
+      const todayStr = getTodayName();
+      selectedMobileDay = DAYS_ORDER.includes(todayStr) ? todayStr : 'Lunes';
+    }
+
+    mobileDaySelector.innerHTML = '';
+    DAYS_ORDER.forEach(dia => {
+      const btn = document.createElement('button');
+      btn.className = 'day-btn';
+      if (dia === selectedMobileDay) btn.classList.add('is-active');
+      // Solo mostramos el nombre, sin el número
+      btn.textContent = dia;
+      
+      btn.onclick = () => {
+        selectedMobileDay = dia;
+        renderMobile();
+        updateLive();
+      };
+      mobileDaySelector.appendChild(btn);
+    });
+
+    mobileClassList.innerHTML = '';
+    const classes = scheduleData[selectedMobileDay] || [];
+    
+    if (classes.length === 0) {
+      mobileClassList.innerHTML = '<li class="empty-state">No hay clases este día.</li>';
+      return;
+    }
+
+    classes.forEach((clase, idx) => {
+      const li = document.createElement('li');
+      const isRecreo = (clase.asignatura || '').toUpperCase().includes('RECREO');
+      
+      if (isRecreo) {
+        li.className = 'mobile-class-item is-recreo';
+        li.dataset.idx = idx;
+        li.innerHTML = `${clase.hora || ''} | ${escapeHtml(clase.asignatura || '')}`;
+      } else {
+        li.className = 'mobile-class-item';
+        li.dataset.idx = idx;
+        
+        const times = (clase.hora || '').split(' - ');
+        const timeHtml = times.length === 2 ? `${times[0]}<br>${times[1]}` : clase.hora;
+
+        li.innerHTML = `
+          <span class="mobile-class-time">${timeHtml}</span>
+          <div class="mobile-class-info">
+            <span class="mobile-class-name">${escapeHtml(clase.asignatura || '')}</span>
+            <span class="mobile-class-teacher">${escapeHtml(clase.profesor || '')}</span>
+          </div>
+        `;
+      }
+      mobileClassList.appendChild(li);
+    });
+  }
+
+  const escapeHtml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  window.addEventListener('DOMContentLoaded', loadHorario);
+</script>
+</body>
+</html>

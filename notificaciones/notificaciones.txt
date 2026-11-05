@@ -1,0 +1,23 @@
+nombre: Recordatorio examen
+hora: 18:30
+dia: 2025-11-15
+descripcion: Estudiar los temas 3 y 4 de matemáticas.
+cambio: Nuevo
+activo: no
+contador: si
+objetivo: 2026-11-15 18:30
+enlace: tareas.html
+boton: Ver tareas
+
+---
+
+nombre: Entrega de trabajo
+hora: 23:59
+dia: 2026-11-10
+descripcion: Subir el PDF a la plataforma.
+cambio: Importante
+activo: si
+contador: si
+objetivo: 2026-11-10 23:59
+enlace: https://classroom.google.com
+boton: Abrir Classroom

@@ -1,0 +1,165 @@
+categoria: Google Workspace
+nombre: Google Docs
+enlace: https://docs.google.com/document/u/0/
+descripcion: Documentos
+icono: file-text
+
+---
+
+categoria: Google Workspace
+nombre: Google Sheets
+enlace: https://docs.google.com/spreadsheets/u/0/
+descripcion: Hojas de cálculo
+icono: table
+
+---
+
+categoria: Google Workspace
+nombre: Google Slides
+enlace: https://docs.google.com/presentation/u/0/
+descripcion: Presentaciones
+icono: presentation
+
+---
+
+categoria: Google Workspace
+nombre: Google Drive
+enlace: https://drive.google.com/drive/u/0/my-drive
+descripcion: Almacenamiento
+icono: hard-drives
+
+---
+
+categoria: Google Workspace
+nombre: Gmail
+enlace: https://mail.google.com/
+descripcion: Correo
+icono: envelope-simple
+
+---
+
+categoria: Google Workspace
+nombre: Google Calendar
+enlace: https://calendar.google.com/
+descripcion: Calendario
+icono: calendar-dots
+
+---
+
+categoria: Google Workspace
+nombre: Google Meet
+enlace: https://meet.google.com/
+descripcion: Videollamadas
+icono: video-camera
+
+---
+
+categoria: Google Workspace
+nombre: Google Classroom
+enlace: https://classroom.google.com/
+descripcion: Clases
+icono: chalkboard
+
+---
+
+categoria: Google Workspace
+nombre: Google Forms
+enlace: https://docs.google.com/forms/u/0/
+descripcion: Formularios
+icono: list-dashes
+
+---
+
+categoria: Google Workspace
+nombre: Google Keep
+enlace: https://keep.google.com/
+descripcion: Notas
+icono: note
+
+---
+
+categoria: Google Workspace
+nombre: Google Photos
+enlace: https://photos.google.com/
+descripcion: Fotos
+icono: image
+
+---
+
+categoria: Google Workspace
+nombre: Google Translate
+enlace: https://translate.google.com/
+descripcion: Traductor
+icono: translate
+
+---
+
+categoria: Clases del curso
+nombre: Montaje 26-27
+enlace: https://classroom.google.com/c/ODg1ODEyODI4OTM1
+descripcion: Google Classroom
+icono: book-open
+
+---
+
+categoria: Clases del curso
+nombre: IPE 1 26-27
+enlace: https://classroom.google.com/c/ODg0MTQzNzM1NTEw
+descripcion: Google Classroom
+icono: briefcase
+
+---
+
+categoria: Clases del curso
+nombre: Sostenibilidad Aplicada al Sistema Productivo
+enlace: https://classroom.google.com/c/ODI2NDIwMTY2MTQ2
+descripcion: Google Classroom
+icono: leaf
+
+---
+
+categoria: Clases del curso
+nombre: SOM 26-27
+enlace: https://classroom.google.com/c/ODc4NDU3Njg0NTQ1
+descripcion: Google Classroom
+icono: heart-beat
+
+---
+
+categoria: Clases del curso
+nombre: Aplicaciones Ofimáticas 26-27
+enlace: https://classroom.google.com/c/ODc2MDk1ODA5OTY0
+descripcion: Google Classroom
+icono: desktop
+
+---
+
+categoria: Clases del curso
+nombre: Redes locais
+enlace: https://classroom.google.com/c/ODc0NDI5ODEzNjM5
+descripcion: Google Classroom
+icono: network
+
+---
+
+categoria: Clases del curso
+nombre: Gestión 1CMI 26-27
+enlace: https://classroom.google.com/c/ODc4MDUxNjYwNjMw
+descripcion: Google Classroom
+icono: buildings
+
+---
+
+categoria: Clases del curso
+nombre: 1º SIMIRE Inglés Profesional
+enlace: https://classroom.google.com/c/ODc4MTk1NjU1NDgx
+descripcion: Google Classroom
+icono: translate
+
+---
+
+categoria: Diseño
+nombre: Canva
+enlace: https://www.canva.com/
+descripcion: Diseño gráfico
+icono: paint-brush

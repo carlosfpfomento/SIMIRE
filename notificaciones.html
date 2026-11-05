@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notificaciones</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    min-height: 100vh;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ MENÚ ============ */
+  .menu-toggle {
+    position: fixed; top: 20px; right: 24px; z-index: 300;
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .menu-toggle .bars span { display: block; height: 2px; width: 100%; background: #111; transition: all 0.3s; transform-origin: center; }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 200; background: #fff;
+    padding: 100px 48px 48px; display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; transform: translateY(-16px);
+    transition: opacity 0.35s, transform 0.35s, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .menu-header { position: absolute; top: 30px; left: 48px; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #bbb; }
+  .menu-body { max-width: 900px; width: 100%; margin: auto; display: flex; flex-direction: column; justify-content: center; flex: 1; }
+  .menu-list { list-style: none; display: flex; flex-direction: column; }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+  .menu-list li a { display: grid; grid-template-columns: 70px 1fr auto; align-items: baseline; gap: 24px; padding: 22px 0; width: 100%; text-align: left; transition: all 0.3s; }
+  .menu-list li a:hover { padding-left: 16px; color: #888; outline: none; }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc { font-size: 13px; color: #999; font-family: system-ui, sans-serif; text-align: right; max-width: 280px; }
+  .menu-footer { max-width: 900px; width: 100%; margin: 40px auto 0; font-size: 11px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* ============ NOTIFICACIONES ============ */
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 96px 24px 60px;
+  }
+
+  .notif-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #ececea;
+    padding-bottom: 16px;
+  }
+  .notif-title {
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 400;
+    letter-spacing: -0.8px;
+  }
+  .notif-count {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .notif-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .notif-card {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    position: relative;
+    border-left: 4px solid #1a1a2e; /* Color por defecto */
+  }
+  .notif-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .notif-card.is-inactive {
+    opacity: 0.5;
+    background: #fafaf8;
+    border-left-color: #999 !important;
+  }
+
+  .notif-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .notif-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .notif-card-title {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+  }
+  
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: system-ui, sans-serif;
+    border-radius: 999px;
+    font-weight: 700;
+    color: #fff;
+    background: #1a1a2e;
+  }
+  .chip.inactive {
+    background: #ccc;
+    color: #fff;
+  }
+  .chip.change {
+    background: #c0392b; /* Rojo elegante para cambios */
+  }
+
+  .notif-card-date {
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .notif-card-desc {
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  /* Contador regresivo */
+  .countdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #fafaf8;
+    border: 1px solid #ececea;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-family: system-ui, sans-serif;
+    margin-top: 4px;
+    width: fit-content;
+  }
+  .countdown .cd-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+  }
+  .countdown .cd-units {
+    display: flex;
+    gap: 10px;
+  }
+  .countdown .cd-unit {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+  .countdown .cd-num {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown .cd-suffix {
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+  }
+  .countdown.is-over { background: #f0f0f0; border-color: #ddd; }
+  .countdown.is-over .cd-num, .countdown.is-over .cd-label { color: #999; }
+
+  /* Acciones */
+  .notif-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+  .btn-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: system-ui, sans-serif;
+    background: #111;
+    color: #fff;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn-go:hover {
+    background: #333;
+    transform: translateY(-1px);
+  }
+
+  .empty-state, .error-state {
+    padding: 40px 20px;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    color: #999;
+    background: #fff;
+    border: 1px dashed #e2e2e2;
+    border-radius: 16px;
+  }
+  .error-state {
+    color: #c0392b;
+    border-color: #f5b8af;
+    background: #fef6f5;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; }
+    .menu-list li a { grid-template-columns: 40px 1fr; gap: 14px; padding: 18px 0; }
+    .menu-list .desc { display: none; }
+    .page { padding: 84px 16px 40px; }
+  }
+
+  @media (max-width: 480px) {
+    .menu-toggle { top: 14px; right: 14px; width: 44px; height: 44px; }
+    .mobile-menu { padding: 82px 20px 28px; }
+    .page { padding: 78px 16px 32px; }
+    .notif-card { padding: 18px; border-radius: 14px; }
+    .notif-card-head { flex-direction: column; gap: 8px; }
+    .notif-card-title { font-size: 18px; }
+    .countdown { width: 100%; justify-content: space-between; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+    <span class="bars"><span></span><span></span><span></span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Exámenes</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Lista</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Compañeros</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Velocidad</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Números</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Juego</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Palabras</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="notif-header">
+      <h1 class="notif-title">Notificaciones</h1>
+      <span class="notif-count" id="notifCount">Cargando...</span>
+    </div>
+    <div id="errorBox" class="error-state" hidden></div>
+    <ul class="notif-list" id="notifList"></ul>
+  </div>
+
+<script>
+  /* ============ MENÚ ============ */
+  const toggle = document.getElementById('menuToggle');
+  const body = document.body;
+
+  toggle.addEventListener('click', () => body.classList.toggle('menu-open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) body.classList.remove('menu-open');
+  });
+
+  /* ============ NOTIFICACIONES ============ */
+  const TXT_URL = 'notificaciones/notificaciones.txt';
+  const notifList = document.getElementById('notifList');
+  const notifCount = document.getElementById('notifCount');
+  const errorBox = document.getElementById('errorBox');
+
+  function parseBlock(text) {
+    const data = {};
+    const lines = text.split(/\r?\n/);
+    let key = null, val = [];
+    lines.forEach(line => {
+      const m = line.match(/^([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)\s*:\s*(.*)$/);
+      if (m) {
+        if (key) data[key] = val.join('\n').trim();
+        key = m[1].toLowerCase();
+        val = [m[2]];
+      } else if (key && line.trim() !== '') {
+        val.push(line);
+      }
+    });
+    if (key) data[key] = val.join('\n').trim();
+    return data;
+  }
+
+  function parseNotifText(text) {
+    return text
+      .replace(/\r\n/g, '\n')
+      .split(/^\s*---\s*$/m)
+      .map(b => b.trim())
+      .filter(b => b.length > 0)
+      .map(parseBlock);
+  }
+
+  const toBool = v => ['si', 'sí', 'true', '1', 'yes', 'on'].includes(String(v || '').toLowerCase().trim());
+  const pad = n => String(n).padStart(2, '0');
+
+  // Actualiza todos los contadores en pantalla
+  function updateCountdowns() {
+    document.querySelectorAll('.countdown').forEach(el => {
+      const target = parseInt(el.dataset.target, 10);
+      if (!target) return;
+      
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        el.classList.add('is-over');
+        el.querySelector('.cd-units').innerHTML = '<span class="cd-num" style="font-size:14px">Finalizado</span>';
+        return;
+      }
+      
+      const total = Math.floor(diff / 1000);
+      const d = Math.floor(total / 86400);
+      const h = Math.floor((total % 86400) / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+
+      el.querySelector('.cd-units').innerHTML = `
+        <div class="cd-unit"><span class="cd-num">${pad(d)}</span><span class="cd-suffix">d</span></div>
+        <div class="cd-unit"><span class="cd-num">${pad(h)}</span><span class="cd-suffix">h</span></div>
+        <div class="cd-unit"><span class="cd-num">${pad(m)}</span><span class="cd-suffix">m</span></div>
+        <div class="cd-unit"><span class="cd-num">${pad(s)}</span><span class="cd-suffix">s</span></div>
+      `;
+    });
+  }
+
+  async function loadNotifs() {
+    try {
+      const res = await fetch(`${TXT_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const blocks = parseNotifText(text);
+
+      notifList.innerHTML = '';
+      errorBox.hidden = true;
+
+      if (blocks.length === 0) {
+        notifCount.textContent = '0 avisos';
+        notifList.innerHTML = '<li class="empty-state">No hay notificaciones.</li>';
+        return;
+      }
+
+      // Filtrar activos y contar
+      const activeBlocks = blocks.filter(b => toBool(b.activo) !== false);
+      notifCount.textContent = `${activeBlocks.length} aviso${activeBlocks.length === 1 ? '' : 's'}`;
+
+      // Ordenar por fecha/hora (más nuevas primero)
+      blocks.sort((a, b) => {
+        const dateStrA = `${a.dia || '1970-01-01'} ${a.hora || '00:00'}`;
+        const dateStrB = `${b.dia || '1970-01-01'} ${b.hora || '00:00'}`;
+        return new Date(dateStrB.replace(' ', 'T')) - new Date(dateStrA.replace(' ', 'T'));
+      });
+
+      blocks.forEach(data => {
+        const isActive = toBool(data.activo) !== false; // Por defecto true si no se pone
+        const hasContador = toBool(data.contador);
+        
+        const li = document.createElement('li');
+        li.className = 'notif-card' + (isActive ? '' : ' is-inactive');
+
+        // Etiquetas (Chips)
+        let chipsHtml = '';
+        if (data.cambio) {
+          chipsHtml += `<span class="chip change">${data.cambio}</span>`;
+        }
+        if (!isActive) {
+          chipsHtml += `<span class="chip inactive">Inactivo</span>`;
+        }
+
+        // Fecha y hora
+        let dateHtml = '';
+        if (data.dia) {
+          let dStr = data.dia;
+          // Formatear fecha si es YYYY-MM-DD
+          if (/^\d{4}-\d{2}-\d{2}$/.test(dStr)) {
+            const parts = dStr.split('-');
+            dStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+          }
+          dateHtml = `<span class="notif-card-date">📅 ${dStr} ${data.hora ? `· ${data.hora}` : ''}</span>`;
+        }
+
+        // Contador
+        let countdownHtml = '';
+        if (hasContador) {
+          let targetTime = 0;
+          if (data.objetivo) {
+            targetTime = new Date(data.objetivo.replace(' ', 'T')).getTime();
+          } else if (data.dia) {
+            targetTime = new Date(`${data.dia}T${data.hora || '00:00'}`).getTime();
+          }
+          
+          if (targetTime > 0) {
+            countdownHtml = `
+              <div class="countdown" data-target="${targetTime}">
+                <span class="cd-label">Quedan</span>
+                <div class="cd-units"><!-- JS rellena esto --></div>
+              </div>
+            `;
+          }
+        }
+
+        // Botón
+        let btnHtml = '';
+        if (data.enlace) {
+          const btnText = data.boton || 'Ir a la página';
+          btnHtml = `<a class="btn-go" href="${data.enlace}">${btnText} →</a>`;
+        }
+
+        li.innerHTML = `
+          <div class="notif-card-head">
+            <div class="notif-title-row">
+              <span class="notif-card-title">${escapeHtml(data.nombre || 'Aviso')}</span>
+              ${chipsHtml}
+            </div>
+            ${dateHtml}
+          </div>
+          <div class="notif-card-desc">${escapeHtml(data.descripcion || '')}</div>
+          ${countdownHtml}
+          ${btnHtml ? `<div class="notif-card-actions">${btnHtml}</div>` : ''}
+        `;
+        notifList.appendChild(li);
+      });
+
+      updateCountdowns();
+      
+      // Actualizar contadores cada segundo
+      if (window.countdownInterval) clearInterval(window.countdownInterval);
+      window.countdownInterval = setInterval(updateCountdowns, 1000);
+
+    } catch (e) {
+      console.error(e);
+      notifCount.textContent = 'Error';
+      errorBox.hidden = false;
+      errorBox.textContent = 'No se pudo cargar notificaciones/notificaciones.txt. Recuerda usar un servidor (no file://).';
+    }
+  }
+
+  const escapeHtml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  window.addEventListener('DOMContentLoaded', loadNotifs);
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+dia: Lunes
+hora: 08:30 - 09:20
+asignatura: Sistemas Operativos Monopuesto
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Lunes
+hora: 09:20 - 10:10
+asignatura: Sistemas Operativos Monopuesto
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Lunes
+hora: 10:10 - 11:00
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Lunes
+hora: 11:00 - 11:20
+asignatura: RECREO
+profesor: 
+
+---
+
+dia: Lunes
+hora: 11:20 - 12:10
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Lunes
+hora: 12:10 - 13:00
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Lunes
+hora: 13:00 - 13:50
+asignatura: Itinerario Personal para la Empleabilidad
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Lunes
+hora: 13:50 - 14:40
+asignatura: Itinerario Personal para la Empleabilidad
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Lunes
+hora: 14:40 - 15:30
+asignatura: REFUERZO
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Lunes
+hora: 15:30 - 16:45
+asignatura: REFUERZO
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Martes
+hora: 08:30 - 09:20
+asignatura: Aplicaciones Ofimáticas
+profesor: Jaime Antonio Losada López
+
+---
+
+dia: Martes
+hora: 09:20 - 10:10
+asignatura: Aplicaciones Ofimáticas
+profesor: Jaime Antonio Losada López
+
+---
+
+dia: Martes
+hora: 10:10 - 11:00
+asignatura: Aplicaciones Ofimáticas
+profesor: Jaime Antonio Losada López
+
+---
+
+dia: Martes
+hora: 11:00 - 11:20
+asignatura: RECREO
+profesor: 
+
+---
+
+dia: Martes
+hora: 11:20 - 12:10
+asignatura: Sistemas Operativos Monopuesto
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Martes
+hora: 12:10 - 13:00
+asignatura: Sistemas Operativos Monopuesto
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Martes
+hora: 13:00 - 13:50
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Martes
+hora: 13:50 - 14:40
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Miércoles
+hora: 08:30 - 09:20
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Miércoles
+hora: 09:20 - 10:10
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Miércoles
+hora: 10:10 - 11:00
+asignatura: Itinerario Personal para la Empleabilidad
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Miércoles
+hora: 11:00 - 11:20
+asignatura: RECREO
+profesor: 
+
+---
+
+dia: Miércoles
+hora: 11:20 - 12:10
+asignatura: Sostenibilidad
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Miércoles
+hora: 12:10 - 13:00
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Miércoles
+hora: 13:00 - 13:50
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Miércoles
+hora: 13:50 - 14:40
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Miércoles
+hora: 14:40 - 15:30
+asignatura: REFUERZO
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Miércoles
+hora: 15:30 - 16:45
+asignatura: REFUERZO
+profesor: Jaime Antonio Losada López
+
+---
+
+dia: Jueves
+hora: 08:30 - 09:20
+asignatura: Inglés
+profesor: Lucía González
+
+---
+
+dia: Jueves
+hora: 09:20 - 10:10
+asignatura: Inglés
+profesor: Lucía González
+
+---
+
+dia: Jueves
+hora: 10:10 - 11:00
+asignatura: Itinerario Personal para la Empleabilidad
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Jueves
+hora: 11:00 - 11:20
+asignatura: RECREO
+profesor: 
+
+---
+
+dia: Jueves
+hora: 11:20 - 12:10
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Jueves
+hora: 12:10 - 13:00
+asignatura: Montaje y Mantenimiento
+profesor: Conchi Marcos Ramos
+
+---
+
+dia: Jueves
+hora: 13:00 - 13:50
+asignatura: Aplicaciones Ofimáticas (Clase Actual)
+profesor: Jaime Antonio Losada López
+
+---
+
+dia: Jueves
+hora: 13:50 - 14:40
+asignatura: Aplicaciones Ofimáticas (Siguiente)
+profesor: Jaime Antonio Losada López
+
+---
+
+dia: Jueves
+hora: 14:40 - 15:30
+asignatura: REFUERZO
+profesor: Lucía González
+
+---
+
+dia: Jueves
+hora: 15:30 - 16:45
+asignatura: REFUERZO
+profesor: Daniel Rivas Míguez
+
+---
+
+dia: Viernes
+hora: 08:30 - 09:20
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Viernes
+hora: 09:20 - 10:10
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Viernes
+hora: 10:10 - 11:00
+asignatura: Sistemas Operativos Monopuesto
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Viernes
+hora: 11:00 - 11:20
+asignatura: RECREO
+profesor: 
+
+---
+
+dia: Viernes
+hora: 11:20 - 12:10
+asignatura: Sistemas Operativos Monopuesto
+profesor: Enrique Prieto Magán
+
+---
+
+dia: Viernes
+hora: 12:10 - 13:00
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo
+
+---
+
+dia: Viernes
+hora: 13:00 - 13:50
+asignatura: Redes Locales
+profesor: Carlos Comesaña Montalvo

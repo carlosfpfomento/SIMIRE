@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sitios de clase</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    min-height: 100vh;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ MENÚ ============ */
+  .menu-toggle {
+    position: fixed; top: 20px; right: 24px; z-index: 300;
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .menu-toggle .bars span { display: block; height: 2px; width: 100%; background: #111; transition: all 0.3s; transform-origin: center; }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 200; background: #fff;
+    padding: 100px 48px 48px; display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; transform: translateY(-16px);
+    transition: opacity 0.35s, transform 0.35s, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .menu-header { position: absolute; top: 30px; left: 48px; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #bbb; }
+  .menu-body { max-width: 900px; width: 100%; margin: auto; display: flex; flex-direction: column; justify-content: center; flex: 1; }
+  .menu-list { list-style: none; display: flex; flex-direction: column; }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+  .menu-list li a { display: grid; grid-template-columns: 70px 1fr auto; align-items: baseline; gap: 24px; padding: 22px 0; width: 100%; text-align: left; transition: padding-left 0.3s, color 0.25s; }
+  .menu-list li a:hover { padding-left: 16px; color: #888; outline: none; }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc { font-size: 13px; color: #999; font-family: system-ui, sans-serif; text-align: right; max-width: 280px; }
+  .menu-footer { max-width: 900px; width: 100%; margin: 40px auto 0; font-size: 11px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* ============ DISPOSICIÓN SITIOS DE CLASE ============ */
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 90px 24px 60px;
+  }
+
+  /* Widget del profesor actual */
+  .teacher-widget {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 16px;
+    padding: 18px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .teacher-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .teacher-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .teacher-label {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+  }
+  .teacher-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #111;
+    line-height: 1.2;
+  }
+  .teacher-subject {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    color: #666;
+  }
+
+  /* Layout de paneles */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .panel {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+
+  .grid-names {
+    display: grid;
+    gap: 10px;
+  }
+  .panel-main .grid-names {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .panel-side .grid-names {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Tarjeta de persona */
+  .name-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 8px;
+    background: #fdfdfd;
+    border: 1px solid #ececea;
+    border-radius: 10px;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s, color 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .name-card:hover {
+    background: #fff;
+    border-color: #111;
+    color: #111;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  }
+  .name-card:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .name-card.empty {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; font-size: 12px; letter-spacing: 3px; }
+    .menu-body { justify-content: flex-start; }
+    .menu-list li a { grid-template-columns: 40px 1fr; gap: 14px; padding: 18px 0; align-items: center; }
+    .menu-list li a:hover { padding-left: 10px; }
+    .menu-list .num { font-size: 12px; }
+    .menu-list .label { font-size: clamp(24px, 7vw, 36px); letter-spacing: -0.8px; }
+    .menu-list .desc { display: none; }
+    .menu-footer { font-size: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    
+    .page { padding: 76px 16px 40px; }
+    .teacher-widget { padding: 16px; gap: 12px; }
+    .teacher-name { font-size: 16px; }
+    .teacher-icon { width: 40px; height: 40px; font-size: 18px; }
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 76px 0 40px; }
+    .teacher-widget { margin: 0 8px 16px; }
+    
+    .layout {
+      padding: 0 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .layout::-webkit-scrollbar { display: none; }
+
+    .panel {
+      padding: 16px;
+      border-radius: 14px;
+      min-width: 320px; 
+    }
+    .grid-names { gap: 6px; }
+    .name-card {
+      padding: 12px 4px;
+      font-size: 11px;
+      border-radius: 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .menu-toggle { top: 14px; right: 14px; width: 44px; height: 44px; }
+    .mobile-menu { padding: 82px 20px 28px; }
+    .menu-header { left: 20px; top: 22px; }
+    
+    .layout { padding: 0 4px; }
+    .panel { padding: 12px; min-width: 290px; }
+    .name-card { padding: 10px 2px; font-size: 10px; }
+    .grid-names { gap: 4px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+    <span class="bars"><span></span><span></span><span></span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Exámenes</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Lista</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Compañeros</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Velocidad</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Números</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Juego</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Palabras</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    
+    <!-- Widget del profesor -->
+    <div class="teacher-widget" id="teacherWidget" style="display: none;">
+      <div class="teacher-icon">👨‍🏫</div>
+      <div class="teacher-info">
+        <span class="teacher-label" id="teacherLabel">Profesor actual</span>
+        <span class="teacher-name" id="teacherName">Cargando...</span>
+        <span class="teacher-subject" id="teacherSubject"></span>
+      </div>
+    </div>
+
+    <div class="layout">
+      
+      <!-- Panel Principal -->
+      <div class="panel panel-main">
+        <div class="grid-names">
+          <a class="name-card" href="#">Pablo</a>
+          <a class="name-card" href="#">Fernando</a>
+          <a class="name-card" href="#">Juan</a>
+          <a class="name-card" href="#">Iago</a>
+          <a class="name-card" href="#">Airam</a>
+
+          <a class="name-card" href="#">Brais</a>
+          <a class="name-card" href="#">Brego</a>
+          <a class="name-card" href="#">Diego</a>
+          <a class="name-card" href="#">Alejandra</a>
+          <a class="name-card" href="#">Liam</a>
+
+          <a class="name-card" href="#">David</a>
+          <a class="name-card" href="#">Ivan</a>
+          <a class="name-card" href="#">Daniel</a>
+          <a class="name-card" href="#">Ares</a>
+          <a class="name-card" href="#">Pablo</a>
+
+          <a class="name-card" href="#">Adrian</a>
+          <a class="name-card" href="#">Alejandro</a>
+          <a class="name-card" href="#">Andres</a>
+          <a class="name-card" href="#">Breogan</a>
+          <div class="name-card empty"></div>
+        </div>
+      </div>
+
+      <!-- Panel Secundario -->
+      <div class="panel panel-side">
+        <div class="grid-names">
+          <a class="name-card" href="#">Brais</a>
+          <a class="name-card" href="#">Thiago</a>
+          <a class="name-card" href="#">Layla</a>
+
+          <a class="name-card" href="#">Simon</a>
+          <a class="name-card" href="#">Izan</a>
+          <a class="name-card" href="#">Iago</a>
+
+          <a class="name-card" href="#">Aitor</a>
+          <a class="name-card" href="#">Pedro</a>
+          <a class="name-card" href="#">David</a>
+
+          <a class="name-card" href="#">Carlos</a>
+          <a class="name-card" href="#">Ines</a>
+          <a class="name-card" href="#">Pablo</a>
+
+          <a class="name-card" href="#">Anxo</a>
+          <a class="name-card" href="#">Marc</a>
+          <a class="name-card" href="#">Gabriel</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const body = document.body;
+
+  function openMenu() {
+    body.classList.add('menu-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Cerrar menú');
+    const first = menu.querySelector('a');
+    if (first) setTimeout(() => first.focus(), 350);
+  }
+  function closeMenu() {
+    body.classList.remove('menu-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Abrir menú');
+    toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    body.classList.contains('menu-open') ? closeMenu() : openMenu();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) closeMenu();
+  });
+
+  /* ============ LÓGICA DEL PROFESOR ACTUAL ============ */
+  const TXT_URL = 'horario/horario.txt';
+  const teacherWidget = document.getElementById('teacherWidget');
+  const teacherLabel = document.getElementById('teacherLabel');
+  const teacherName = document.getElementById('teacherName');
+  const teacherSubject = document.getElementById('teacherSubject');
+
+  const DAYS_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  let scheduleData = {};
+
+  function parseBlock(text) {
+    const data = {};
+    const lines = text.split(/\r?\n/);
+    let key = null, val = [];
+    lines.forEach(line => {
+      const m = line.match(/^([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)\s*:\s*(.*)$/);
+      if (m) {
+        if (key) data[key] = val.join('\n').trim();
+        key = m[1].toLowerCase();
+        val = [m[2]];
+      } else if (key && line.trim() !== '') {
+        val.push(line);
+      }
+    });
+    if (key) data[key] = val.join('\n').trim();
+    return data;
+  }
+
+  function parseHorarioText(text) {
+    return text.replace(/\r\n/g, '\n').split(/^\s*---\s*$/m).map(b => b.trim()).filter(b => b.length > 0).map(parseBlock);
+  }
+
+  function getTodayName() {
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return days[new Date().getDay()];
+  }
+
+  function timeToMs(timeStr) {
+    if (!timeStr) return null;
+    const [h, m] = timeStr.split(':').map(Number);
+    return (h * 60 + m) * 60 * 1000;
+  }
+
+  function updateTeacherWidget() {
+    const now = new Date();
+    const today = getTodayName();
+    
+    // Si no es un día de clase, ocultar o mostrar "No hay clase"
+    if (!DAYS_ORDER.includes(today) || !scheduleData[today]) {
+      teacherWidget.style.display = 'flex';
+      teacherLabel.textContent = 'Fin de semana';
+      teacherName.textContent = 'No hay clases hoy';
+      teacherSubject.textContent = '';
+      return;
+    }
+
+    const nowMs = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
+    const classes = scheduleData[today];
+    let currentClass = null;
+
+    // Buscar si estamos en horario de clase
+    for (let i = 0; i < classes.length; i++) {
+      const c = classes[i];
+      const times = (c.hora || '').split(' - ');
+      if (times.length === 2) {
+        const start = timeToMs(times[0]);
+        const end = timeToMs(times[1]);
+        if (nowMs >= start && nowMs < end) {
+          currentClass = c;
+          break;
+        }
+      }
+    }
+
+    teacherWidget.style.display = 'flex';
+
+    if (currentClass) {
+      const isRecreo = (currentClass.asignatura || '').toUpperCase().includes('RECREO');
+      
+      if (isRecreo) {
+        teacherLabel.textContent = 'Ahora mismo';
+        teacherName.textContent = 'Recreo ☕';
+        teacherSubject.textContent = 'Tiempo libre';
+      } else {
+        teacherLabel.textContent = 'Profesor actual';
+        // Limpiamos el nombre por si tiene "(Clase Actual)" u otros añadidos
+        let profName = currentClass.profesor || 'Profesor no asignado';
+        teacherName.textContent = profName;
+        
+        let asigName = currentClass.asignatura || '';
+        teacherSubject.textContent = asigName;
+      }
+    } else {
+      // Fuera de horario de clase
+      teacherLabel.textContent = 'Ahora mismo';
+      teacherName.textContent = 'Sin clase';
+      teacherSubject.textContent = '';
+    }
+  }
+
+  async function loadSchedule() {
+    try {
+      const res = await fetch(`${TXT_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const blocks = parseHorarioText(text);
+
+      scheduleData = {};
+      blocks.forEach(b => {
+        const dia = b.dia || 'Sin día';
+        if (!scheduleData[dia]) scheduleData[dia] = [];
+        scheduleData[dia].push(b);
+      });
+
+      // Ordenar por horas
+      Object.keys(scheduleData).forEach(dia => {
+        scheduleData[dia].sort((a, b) => {
+          const hA = (a.hora || '').split(' - ')[0];
+          const hB = (b.hora || '').split(' - ')[0];
+          return hA.localeCompare(hB);
+        });
+      });
+
+      updateTeacherWidget();
+      // Actualizar cada minuto (o cada segundo si quieres ser exacto, pero cada minuto ahorra batería)
+      setInterval(updateTeacherWidget, 60000); 
+
+    } catch (e) {
+      console.warn("No se pudo cargar el horario:", e);
+      teacherWidget.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', loadSchedule);
+</script>
+</body>
+</html>

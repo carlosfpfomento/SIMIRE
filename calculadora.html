@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Calculadora</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ MENÚ ============ */
+  .menu-toggle {
+    position: fixed; top: 20px; right: 24px; z-index: 300;
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+  .menu-toggle .bars span { display: block; height: 2px; width: 100%; background: #111; transition: all 0.3s; transform-origin: center; }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 200; background: #fff;
+    padding: 100px 48px 48px; display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden; transform: translateY(-16px);
+    transition: opacity 0.35s, transform 0.35s, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .menu-header { position: absolute; top: 30px; left: 48px; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #bbb; }
+  .menu-body { max-width: 900px; width: 100%; margin: auto; display: flex; flex-direction: column; justify-content: center; flex: 1; }
+  .menu-list { list-style: none; display: flex; flex-direction: column; }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+  .menu-list li a { display: grid; grid-template-columns: 70px 1fr auto; align-items: baseline; gap: 24px; padding: 22px 0; width: 100%; text-align: left; transition: padding-left 0.3s, color 0.25s; }
+  .menu-list li a:hover { padding-left: 16px; color: #888; outline: none; }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc { font-size: 13px; color: #999; font-family: system-ui, sans-serif; text-align: right; max-width: 280px; }
+  .menu-footer { max-width: 900px; width: 100%; margin: 40px auto 0; font-size: 11px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* ============ PÁGINA ============ */
+  .page {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 16px 20px;
+  }
+
+  .calc-container {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 24px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 380px;
+    height: 100%;
+    max-height: 700px;
+    gap: 12px;
+  }
+
+  /* Pestañas */
+  .tabs {
+    display: flex;
+    background: #f4f4f2;
+    padding: 4px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .tab-btn.is-active {
+    background: #fff;
+    color: #111;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* Pantalla */
+  .display {
+    background: #fafaf8;
+    border: 1px solid #ececea;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    height: 100px;
+    overflow: hidden;
+  }
+  .display-history {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    color: #999;
+    min-height: 18px;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .display-history::-webkit-scrollbar { display: none; }
+  .display-current {
+    font-family: system-ui, sans-serif;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 700;
+    color: #111;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .display-current::-webkit-scrollbar { display: none; }
+
+  /* Teclados */
+  .keypad {
+    display: none;
+    flex: 1;
+    gap: 8px;
+    min-height: 0;
+  }
+  .keypad.is-active {
+    display: grid;
+  }
+
+  /* Cuadrícula uniforme */
+  .keypad-basic { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(5, 1fr); }
+  .keypad-scientific { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(8, 1fr); }
+
+  /* Botones (TODOS IGUALES) */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafaf8;
+    border: 1px solid #ececea;
+    border-radius: 12px;
+    font-family: system-ui, sans-serif;
+    font-size: clamp(14px, 4vw, 18px);
+    font-weight: 500;
+    color: #333;
+    transition: all 0.15s ease;
+    user-select: none;
+    height: 100%;
+    width: 100%;
+  }
+  .btn:hover { background: #f0f0f0; border-color: #ddd; }
+  .btn:active { transform: scale(0.95); background: #e8e8e8; }
+
+  /* Estilos de color */
+  .btn.op { color: #c0392b; font-weight: 600; background: #fff; border-color: #f0e6e6; }
+  .btn.op:hover { background: #fef6f5; border-color: #f5b8af; }
+  
+  .btn.fn { color: #2c3e50; font-weight: 600; background: #f4f6f8; border-color: #e2e8f0; font-size: clamp(12px, 3.5vw, 15px); }
+  .btn.fn:hover { background: #e2e8f0; border-color: #cbd5e1; }
+  
+  .btn.eq { background: #111; color: #fff; border-color: #111; }
+  .btn.eq:hover { background: #333; }
+  .btn.eq:active { background: #000; }
+  
+  .btn.clear { color: #c0392b; background: #fef6f5; border-color: #f5b8af; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; }
+    .menu-list li a { grid-template-columns: 40px 1fr; gap: 14px; padding: 18px 0; align-items: center; }
+    .menu-list li a:hover { padding-left: 10px; }
+    .menu-list .desc { display: none; }
+    .menu-list .label { font-size: clamp(24px, 7vw, 36px); }
+    .menu-footer { flex-direction: column; align-items: flex-start; }
+    
+    .page { padding: 76px 12px 12px; }
+    .calc-container { padding: 12px; border-radius: 20px; max-width: 100%; gap: 10px; }
+    .display { height: 90px; padding: 12px; }
+    
+    .keypad { gap: 6px; }
+    .btn { border-radius: 10px; }
+  }
+</style>
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+    <span class="bars"><span></span><span></span><span></span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Exámenes</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Lista</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Compañeros</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Velocidad</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Números</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Juego</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Palabras</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="calc-container">
+      
+      <!-- Pestañas -->
+      <div class="tabs">
+        <button class="tab-btn is-active" data-target="basic">Básica</button>
+        <button class="tab-btn" data-target="scientific">Científica</button>
+      </div>
+
+      <!-- Pantalla -->
+      <div class="display">
+        <div class="display-history" id="calcHistory"></div>
+        <div class="display-current" id="calcCurrent">0</div>
+      </div>
+
+      <!-- Teclado Básico (4x5 = 20 botones, todos iguales) -->
+      <div class="keypad keypad-basic is-active" id="keypadBasic">
+        <button class="btn fn clear" onclick="calcAction('clear')">C</button>
+        <button class="btn fn" onclick="calcAction('backspace')">⌫</button>
+        <button class="btn fn" onclick="calcAction('%')">%</button>
+        <button class="btn op" onclick="calcAction('/')">÷</button>
+
+        <button class="btn" onclick="calcAction('7')">7</button>
+        <button class="btn" onclick="calcAction('8')">8</button>
+        <button class="btn" onclick="calcAction('9')">9</button>
+        <button class="btn op" onclick="calcAction('*')">×</button>
+
+        <button class="btn" onclick="calcAction('4')">4</button>
+        <button class="btn" onclick="calcAction('5')">5</button>
+        <button class="btn" onclick="calcAction('6')">6</button>
+        <button class="btn op" onclick="calcAction('-')">−</button>
+
+        <button class="btn" onclick="calcAction('1')">1</button>
+        <button class="btn" onclick="calcAction('2')">2</button>
+        <button class="btn" onclick="calcAction('3')">3</button>
+        <button class="btn op" onclick="calcAction('+')">+</button>
+
+        <!-- Los 4 botones de la última fila, todos iguales -->
+        <button class="btn" onclick="calcAction('0')">0</button>
+        <button class="btn" onclick="calcAction('.')">.</button>
+        <button class="btn" onclick="calcAction('(')">(</button>
+        <button class="btn eq" onclick="calcAction('=')">=</button>
+      </div>
+
+      <!-- Teclado Científico (4x8 = 32 botones, todos iguales) -->
+      <div class="keypad keypad-scientific" id="keypadScientific">
+        <button class="btn fn" onclick="calcAction('sin(')">sin</button>
+        <button class="btn fn" onclick="calcAction('cos(')">cos</button>
+        <button class="btn fn" onclick="calcAction('tan(')">tan</button>
+        <button class="btn fn clear" onclick="calcAction('clear')">C</button>
+
+        <button class="btn fn" onclick="calcAction('asin(')">sin⁻¹</button>
+        <button class="btn fn" onclick="calcAction('acos(')">cos⁻¹</button>
+        <button class="btn fn" onclick="calcAction('atan(')">tan⁻¹</button>
+        <button class="btn fn" onclick="calcAction('backspace')">⌫</button>
+
+        <button class="btn fn" onclick="calcAction('log(')">log</button>
+        <button class="btn fn" onclick="calcAction('ln(')">ln</button>
+        <button class="btn fn" onclick="calcAction('sqrt(')">√x</button>
+        <button class="btn fn" onclick="calcAction('^')">x^y</button>
+
+        <button class="btn fn" onclick="calcAction('(')">(</button>
+        <button class="btn fn" onclick="calcAction(')')">)</button>
+        <button class="btn fn" onclick="calcAction('!')">x!</button>
+        <button class="btn fn" onclick="calcAction('abs(')">|x|</button>
+
+        <button class="btn fn" onclick="calcAction('pi')">π</button>
+        <button class="btn fn" onclick="calcAction('e')">e</button>
+        <button class="btn op" onclick="calcAction('/')">÷</button>
+        <button class="btn op" onclick="calcAction('*')">×</button>
+
+        <button class="btn" onclick="calcAction('7')">7</button>
+        <button class="btn" onclick="calcAction('8')">8</button>
+        <button class="btn" onclick="calcAction('9')">9</button>
+        <button class="btn op" onclick="calcAction('-')">−</button>
+
+        <button class="btn" onclick="calcAction('4')">4</button>
+        <button class="btn" onclick="calcAction('5')">5</button>
+        <button class="btn" onclick="calcAction('6')">6</button>
+        <button class="btn op" onclick="calcAction('+')">+</button>
+
+        <button class="btn" onclick="calcAction('1')">1</button>
+        <button class="btn" onclick="calcAction('2')">2</button>
+        <button class="btn" onclick="calcAction('3')">3</button>
+        <button class="btn eq" onclick="calcAction('=')">=</button>
+
+        <!-- Los 4 botones de la última fila, todos iguales -->
+        <button class="btn" onclick="calcAction('0')">0</button>
+        <button class="btn" onclick="calcAction('.')">.</button>
+        <button class="btn fn" onclick="calcAction('%')">%</button>
+        <button class="btn fn" onclick="calcAction('π')">π</button>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  /* ============ MENÚ ============ */
+  const toggle = document.getElementById('menuToggle');
+  const body = document.body;
+  toggle.addEventListener('click', () => body.classList.toggle('menu-open'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) body.classList.remove('menu-open');
+  });
+
+  /* ============ CALCULADORA ============ */
+  const displayCurrent = document.getElementById('calcCurrent');
+  const displayHistory = document.getElementById('calcHistory');
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const keypadBasic = document.getElementById('keypadBasic');
+  const keypadScientific = document.getElementById('keypadScientific');
+
+  let currentInput = '0';
+  let historyInput = '';
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      
+      if (btn.dataset.target === 'basic') {
+        keypadBasic.classList.add('is-active');
+        keypadScientific.classList.remove('is-active');
+      } else {
+        keypadBasic.classList.remove('is-active');
+        keypadScientific.classList.add('is-active');
+      }
+    });
+  });
+
+  function updateDisplay() {
+    displayCurrent.textContent = currentInput;
+    displayHistory.textContent = historyInput;
+    displayCurrent.scrollLeft = displayCurrent.scrollWidth;
+    displayHistory.scrollLeft = displayHistory.scrollWidth;
+  }
+
+  function factorial(n) {
+    if (n < 0) return NaN;
+    if (n === 0 || n === 1) return 1;
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
+
+  function evaluateExpression(expr) {
+    let mathExpr = expr
+      .replace(/×/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/−/g, '-')
+      .replace(/π/g, 'Math.PI')
+      .replace(/\be\b/g, 'Math.E')
+      .replace(/sin\(/g, 'Math.sin(')
+      .replace(/cos\(/g, 'Math.cos(')
+      .replace(/tan\(/g, 'Math.tan(')
+      .replace(/asin\(/g, 'Math.asin(')
+      .replace(/acos\(/g, 'Math.acos(')
+      .replace(/atan\(/g, 'Math.atan(')
+      .replace(/log\(/g, 'Math.log10(')
+      .replace(/ln\(/g, 'Math.log(')
+      .replace(/sqrt\(/g, 'Math.sqrt(')
+      .replace(/abs\(/g, 'Math.abs(');
+
+    mathExpr = mathExpr.replace(/(\d+(\.\d+)?|\))!/g, (match) => {
+      const val = match.replace('!', '');
+      return `factorial(${val})`;
+    });
+
+    mathExpr = mathExpr.replace(/\^/g, '**');
+    mathExpr = mathExpr.replace(/%/g, '/100');
+
+    try {
+      const result = new Function('factorial', 'return ' + mathExpr)(factorial);
+      if (!isFinite(result) || isNaN(result)) return 'Error';
+      return parseFloat(result.toFixed(10)).toString();
+    } catch (err) {
+      return 'Error';
+    }
+  }
+
+  window.calcAction = function(action) {
+    if (action === 'clear') {
+      currentInput = '0';
+      historyInput = '';
+    } 
+    else if (action === 'backspace') {
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = '0';
+      }
+    } 
+    else if (action === '=') {
+      if (currentInput === '0' || currentInput === '') return;
+      const result = evaluateExpression(currentInput);
+      historyInput = currentInput + ' =';
+      currentInput = result;
+    } 
+    else {
+      if (currentInput === '0' || currentInput === 'Error') {
+        currentInput = '';
+      }
+      
+      const isOp = ['+', '-', '*', '/', '×', '÷', '^'].includes(action);
+      const lastChar = currentInput.slice(-1);
+      const isLastOp = ['+', '-', '*', '/', '×', '÷', '^'].includes(lastChar);
+
+      if (isOp && isLastOp) {
+        currentInput = currentInput.slice(0, -1) + action;
+      } else {
+        currentInput += action;
+      }
+    }
+    
+    updateDisplay();
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    const key = e.key;
+    
+    if (/[0-9]/.test(key)) calcAction(key);
+    else if (key === '.') calcAction('.');
+    else if (key === '+') calcAction('+');
+    else if (key === '-') calcAction('-');
+    else if (key === '*') calcAction('*');
+    else if (key === '/') calcAction('/');
+    else if (key === 'Enter' || key === '=') { e.preventDefault(); calcAction('='); }
+    else if (key === 'Backspace') calcAction('backspace');
+    else if (key === 'Escape') calcAction('clear');
+    else if (key === '^') calcAction('^');
+    else if (key === '(') calcAction('(');
+    else if (key === ')') calcAction(')');
+    else if (key === '%') calcAction('%');
+    else if (key === '!') calcAction('!');
+  });
+
+  updateDisplay();
+</script>
+</body>
+</html>

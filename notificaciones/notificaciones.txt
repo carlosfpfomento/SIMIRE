@@ -1,6 +1,6 @@
 nombre: Recordatorio examen
 hora: 18:30
-dia: 2025-11-15
+dia: 2026-11-15
 descripcion: Estudiar los temas 3 y 4 de matemáticas.
 cambio: Nuevo
 activo: no

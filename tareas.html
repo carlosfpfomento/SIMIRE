@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tareas</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    min-height: 100vh;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ BOTÓN HAMBURGUESA ============ */
+  .menu-toggle {
+    position: fixed;
+    top: 20px; right: 24px;
+    z-index: 300;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars {
+    width: 20px; height: 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .menu-toggle .bars span {
+    display: block; height: 2px; width: 100%;
+    background: #111;
+    transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+    transform-origin: center;
+  }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* ============ OVERLAY MENÚ ============ */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #fff;
+    padding: 100px 48px 48px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-16px);
+    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .menu-header {
+    position: absolute;
+    top: 30px; left: 48px;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #bbb;
+  }
+  .menu-body {
+    max-width: 900px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+  }
+  .menu-list { list-style: none; display: flex; flex-direction: column; }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+  .menu-list li a {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 22px 0;
+    width: 100%;
+    text-align: left;
+    transition: padding-left 0.3s ease, color 0.25s ease;
+  }
+  .menu-list li a:hover,
+  .menu-list li a:focus-visible { padding-left: 16px; color: #888; outline: none; }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; font-variant-numeric: tabular-nums; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc {
+    font-size: 13px; color: #999; font-family: system-ui, -apple-system, sans-serif;
+    letter-spacing: 0.3px; max-width: 280px; text-align: right; line-height: 1.5; justify-self: end;
+  }
+  .menu-footer {
+    max-width: 900px;
+    width: 100%;
+    margin: 40px auto 0;
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    color: #bbb;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex-wrap: wrap;
+  }
+
+  /* ============ PÁGINA ============ */
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 96px 24px 60px;
+  }
+
+  /* ---- Próximo examen (destacado) ---- */
+  .next-label {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .next-name {
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 400;
+    letter-spacing: -1.8px;
+    line-height: 1.02;
+    margin-bottom: 16px;
+    color: #111;
+  }
+  .next-meta {
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 0.4px;
+    margin-bottom: 28px;
+  }
+  .next-meta strong { color: #111; font-weight: 600; }
+
+  /* ---- Cuenta atrás ---- */
+  .countdown {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .cd-block {
+    flex: 1;
+    max-width: 120px;
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 14px;
+    padding: 18px 8px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cd-num {
+    font-family: system-ui, sans-serif;
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    color: #111;
+    font-variant-numeric: tabular-nums;
+  }
+  .cd-suffix {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 600;
+  }
+  .cd-block.is-zero { opacity: 0.35; }
+  .cd-block.is-sec .cd-num { color: #c0392b; }
+
+  .countdown.is-over {
+    display: block;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #c0392b;
+    padding: 16px;
+    background: #fef6f5;
+    border: 1px solid #f5b8af;
+    border-radius: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ---- Separador ---- */
+  .divider {
+    height: 1px;
+    background: #e5e5e2;
+    margin: 36px 0;
+  }
+
+  /* ---- Lista de siguientes exámenes ---- */
+  .list-label {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .exam-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .exam-item {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid #ececea;
+    transition: padding-left 0.2s;
+  }
+  .exam-item:last-child { border-bottom: 1px solid #ececea; }
+  .exam-item:hover { padding-left: 4px; }
+
+  .exam-item-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 10px;
+    padding: 8px 0;
+    width: 44px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+  .exam-item-day {
+    font-family: system-ui, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+    color: #111;
+  }
+  .exam-item-month {
+    font-family: system-ui, sans-serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 600;
+  }
+
+  .exam-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .exam-item-name {
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: -0.2px;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .exam-item-when {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 0.3px;
+  }
+
+  .exam-item-time {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    color: #c0392b;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .exam-item-time .unit {
+    color: #999;
+    font-weight: 500;
+    margin-left: 1px;
+  }
+
+  /* ---- Estado vacío ---- */
+  .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    color: #999;
+    background: #fff;
+    border: 1px dashed #e2e2e2;
+    border-radius: 14px;
+  }
+
+  /* ---- Error ---- */
+  .error-state {
+    padding: 20px;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    color: #c0392b;
+    background: #fef6f5;
+    border: 1px solid #f5b8af;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; font-size: 12px; letter-spacing: 3px; }
+    .menu-body { justify-content: flex-start; }
+    .menu-list li a {
+      grid-template-columns: 40px 1fr;
+      gap: 14px;
+      padding: 18px 0;
+      align-items: center;
+    }
+    .menu-list li a:hover,
+    .menu-list li a:focus-visible { padding-left: 10px; }
+    .menu-list .num { font-size: 12px; }
+    .menu-list .label { font-size: clamp(24px, 7vw, 36px); letter-spacing: -0.8px; }
+    .menu-list .desc { display: none; }
+    .menu-footer { font-size: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
+  }
+  @media (max-width: 480px) {
+    .menu-toggle { top: 14px; right: 14px; width: 44px; height: 44px; }
+    .mobile-menu { padding: 82px 20px 28px; }
+    .menu-header { left: 20px; top: 22px; }
+
+    .page { padding: 78px 16px 40px; }
+    .next-name { letter-spacing: -1.2px; }
+    .countdown { gap: 6px; }
+    .cd-block { padding: 14px 4px; border-radius: 12px; }
+    .cd-suffix { font-size: 9px; letter-spacing: 1px; }
+
+    .exam-item {
+      grid-template-columns: 40px 1fr auto;
+      gap: 12px;
+      padding: 14px 0;
+    }
+    .exam-item-date { width: 40px; padding: 7px 0; border-radius: 8px; }
+    .exam-item-day { font-size: 15px; }
+    .exam-item-month { font-size: 8px; }
+    .exam-item-name { font-size: 14px; }
+    .exam-item-when { font-size: 10px; }
+    .exam-item-time { font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+    <span class="bars"><span></span><span></span><span></span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos guardados</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Consulta tu horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Exámenes programados</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Próximo examen y lista</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora actual</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Plataformas del curso</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos directos</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Velocidad al teclear</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Operaciones rápidas</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Reto de lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Juego de estrategia</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Palabra del día</span></a></li>
+      </ul>
+    </div>
+    <div class="menu-footer"><span>© 2025 Menú</span></div>
+  </div>
+
+  <div class="page">
+    <div id="errorBox" class="error-state" hidden></div>
+
+    <!-- Próximo examen -->
+    <div id="nextSection">
+      <div class="next-label">Próximo examen</div>
+      <h1 class="next-name" id="nextName">Cargando…</h1>
+      <div class="next-meta" id="nextMeta"></div>
+
+      <div class="countdown" id="countdown">
+        <div class="cd-block" id="cdDays">
+          <span class="cd-num">--</span>
+          <span class="cd-suffix">Días</span>
+        </div>
+        <div class="cd-block" id="cdHours">
+          <span class="cd-num">--</span>
+          <span class="cd-suffix">Horas</span>
+        </div>
+        <div class="cd-block" id="cdMinutes">
+          <span class="cd-num">--</span>
+          <span class="cd-suffix">Min</span>
+        </div>
+        <div class="cd-block is-sec" id="cdSeconds">
+          <span class="cd-num">--</span>
+          <span class="cd-suffix">Seg</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de siguientes -->
+    <div id="listSection">
+      <div class="divider"></div>
+      <div class="list-label">Siguientes exámenes</div>
+      <ul class="exam-list" id="examList"></ul>
+    </div>
+  </div>
+
+<script>
+  /* ============ MENÚ ============ */
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const body = document.body;
+
+  function openMenu() {
+    body.classList.add('menu-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Cerrar menú');
+    const first = menu.querySelector('a');
+    if (first) setTimeout(() => first.focus(), 350);
+  }
+  function closeMenu() {
+    body.classList.remove('menu-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Abrir menú');
+    toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    body.classList.contains('menu-open') ? closeMenu() : openMenu();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) closeMenu();
+  });
+
+  /* ============ TAREAS / EXÁMENES ============ */
+  const TXT_URL = 'calendario/calendario.txt';
+  const DEFAULT_EXAM_COLOR = '#1a1a2e';
+
+  const MONTHS = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const MONTHS_LONG = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const WEEKDAYS_LONG = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+  const nextName = document.getElementById('nextName');
+  const nextMeta = document.getElementById('nextMeta');
+  const countdown = document.getElementById('countdown');
+  const cdDays = document.getElementById('cdDays');
+  const cdHours = document.getElementById('cdHours');
+  const cdMinutes = document.getElementById('cdMinutes');
+  const cdSeconds = document.getElementById('cdSeconds');
+  const examList = document.getElementById('examList');
+  const errorBox = document.getElementById('errorBox');
+
+  let exams = [];
+  let nextExam = null;
+  let tickInterval = null;
+
+  const pad = n => String(n).padStart(2, '0');
+
+  function parseDate(str) {
+    if (!str) return null;
+    const d = new Date(str.trim().replace(' ', 'T'));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function parseBlock(text) {
+    const data = {};
+    const lines = text.split(/\r?\n/);
+    let key = null, val = [];
+    lines.forEach(line => {
+      const m = line.match(/^([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)\s*:\s*(.*)$/);
+      if (m) {
+        if (key) data[key] = val.join('\n').trim();
+        key = m[1].toLowerCase();
+        val = [m[2]];
+      } else if (key && line.trim() !== '') {
+        val.push(line);
+      }
+    });
+    if (key) data[key] = val.join('\n').trim();
+    return data;
+  }
+
+  function parseExamsText(text) {
+    return text
+      .replace(/\r\n/g, '\n')
+      .split(/^\s*---\s*$/m)
+      .map(b => b.trim())
+      .filter(b => b.length > 0)
+      .map(parseBlock);
+  }
+
+  async function loadExams() {
+    try {
+      const res = await fetch(`${TXT_URL}?v=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const blocks = parseExamsText(text);
+
+      exams = [];
+      blocks.forEach((data, i) => {
+        const nombre = data.nombre || `Examen ${i + 1}`;
+        const inicio = parseDate(data.inicio);
+        const fin = parseDate(data.fin) || inicio;
+        if (!inicio) return;
+        exams.push({ nombre, inicio, fin });
+      });
+
+      exams.sort((a, b) => a.inicio - b.inicio);
+      errorBox.hidden = true;
+    } catch (e) {
+      errorBox.hidden = false;
+      errorBox.textContent = 'No se pudo cargar calendario/calendario.txt. Recuerda usar un servidor (no file://).';
+    }
+  }
+
+  // Exámenes que aún no han terminado
+  function upcomingExams() {
+    const now = new Date();
+    return exams.filter(ev => ev.fin >= now);
+  }
+
+  // Formatea "en 3d 14h 22m 09s" para la lista
+  function shortRemaining(target) {
+    const diff = target - new Date();
+    if (diff <= 0) return 'Ahora';
+    const total = Math.floor(diff / 1000);
+    const d = Math.floor(total / 86400);
+    const h = Math.floor((total % 86400) / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    let parts = [];
+    if (d > 0) parts.push(`${d}<span class="unit">d</span>`);
+    if (d > 0 || h > 0) parts.push(`${h}<span class="unit">h</span>`);
+    if (d > 0 || h > 0 || m > 0) parts.push(`${m}<span class="unit">m</span>`);
+    parts.push(`${s}<span class="unit">s</span>`);
+    return parts.join(' ');
+  }
+
+  // Actualiza el contador grande del próximo examen
+  function tickNext() {
+    if (!nextExam) return;
+    const diff = nextExam.inicio - new Date();
+    if (diff <= 0) {
+      countdown.classList.add('is-over');
+      countdown.innerHTML = '¡Ya es el día del examen!';
+      return;
+    }
+    countdown.classList.remove('is-over');
+    const total = Math.floor(diff / 1000);
+    const d = Math.floor(total / 86400);
+    const h = Math.floor((total % 86400) / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+
+    // Reconstruir el HTML (por si se borró al mostrar "¡Ya es el día!")
+    if (!countdown.querySelector('.cd-block')) {
+      countdown.innerHTML = `
+        <div class="cd-block" id="cdDays"><span class="cd-num">--</span><span class="cd-suffix">Días</span></div>
+        <div class="cd-block" id="cdHours"><span class="cd-num">--</span><span class="cd-suffix">Horas</span></div>
+        <div class="cd-block" id="cdMinutes"><span class="cd-num">--</span><span class="cd-suffix">Min</span></div>
+        <div class="cd-block is-sec" id="cdSeconds"><span class="cd-num">--</span><span class="cd-suffix">Seg</span></div>
+      `;
+    }
+
+    const setVal = (sel, val, isZero) => {
+      const block = countdown.querySelector(sel);
+      if (!block) return;
+      block.querySelector('.cd-num').textContent = val;
+      block.classList.toggle('is-zero', isZero);
+    };
+    setVal('#cdDays', pad(d), d === 0);
+    setVal('#cdHours', pad(h), d === 0 && h === 0);
+    setVal('#cdMinutes', pad(m), d === 0 && h === 0 && m === 0);
+    setVal('#cdSeconds', pad(s), false);
+  }
+
+  // Actualiza el texto "en Xd Xh Xm Xs" de cada fila
+  function tickList() {
+    const items = examList.querySelectorAll('.exam-item');
+    items.forEach(li => {
+      const target = parseInt(li.dataset.target, 10);
+      const timeEl = li.querySelector('.exam-item-time');
+      if (timeEl && target) timeEl.innerHTML = shortRemaining(target);
+    });
+  }
+
+  function render() {
+    const upcoming = upcomingExams();
+
+    if (upcoming.length === 0) {
+      nextName.textContent = 'Sin exámenes';
+      nextMeta.textContent = '';
+      countdown.innerHTML = '';
+      countdown.classList.remove('is-over');
+      examList.innerHTML = '<li class="empty-state">No hay exámenes próximos.</li>';
+      nextExam = null;
+      return;
+    }
+
+    // Próximo examen
+    nextExam = upcoming[0];
+    nextName.textContent = nextExam.nombre;
+
+    const dia = nextExam.inicio.getDate();
+    const mes = MONTHS_LONG[nextExam.inicio.getMonth()];
+    const wd = WEEKDAYS_LONG[nextExam.inicio.getDay()];
+    const hora = (nextExam.inicio.getHours() || nextExam.inicio.getMinutes())
+      ? ` · ${pad(nextExam.inicio.getHours())}:${pad(nextExam.inicio.getMinutes())}`
+      : '';
+    nextMeta.innerHTML = `<strong>${wd} ${dia} de ${mes}</strong>${hora}`;
+
+    // Lista (todos menos el primero)
+    const rest = upcoming.slice(1);
+    if (rest.length === 0) {
+      examList.innerHTML = '<li class="empty-state">No hay más exámenes después de este.</li>';
+    } else {
+      examList.innerHTML = rest.map(ev => {
+        const d = ev.inicio.getDate();
+        const m = MONTHS[ev.inicio.getMonth()];
+        const wd = WEEKDAYS_LONG[ev.inicio.getDay()];
+        const hora = (ev.inicio.getHours() || ev.inicio.getMinutes())
+          ? ` · ${pad(ev.inicio.getHours())}:${pad(ev.inicio.getMinutes())}`
+          : '';
+        return `
+          <li class="exam-item" data-target="${ev.inicio.getTime()}">
+            <div class="exam-item-date">
+              <span class="exam-item-day">${d}</span>
+              <span class="exam-item-month">${m}</span>
+            </div>
+            <div class="exam-item-info">
+              <span class="exam-item-name">${escapeHtml(ev.nombre)}</span>
+              <span class="exam-item-when">${wd}${hora}</span>
+            </div>
+            <span class="exam-item-time"></span>
+          </li>
+        `;
+      }).join('');
+    }
+
+    // Iniciar ticks
+    if (tickInterval) clearInterval(tickInterval);
+    tickNext();
+    tickList();
+    tickInterval = setInterval(() => { tickNext(); tickList(); }, 1000);
+  }
+
+  const escapeHtml = s => String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    await loadExams();
+    render();
+  });
+</script>
+</body>
+</html>

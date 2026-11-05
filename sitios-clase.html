@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sitios de clase</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    min-height: 100vh;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ BOTÓN HAMBURGUESA ============ */
+  .menu-toggle {
+    position: fixed;
+    top: 20px; right: 24px;
+    z-index: 300;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars {
+    width: 20px; height: 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .menu-toggle .bars span {
+    display: block; height: 2px; width: 100%;
+    background: #111;
+    transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+    transform-origin: center;
+  }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* ============ OVERLAY MENÚ ============ */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #fff;
+    padding: 100px 48px 48px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-16px);
+    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .menu-header {
+    position: absolute;
+    top: 30px; left: 48px;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #bbb;
+  }
+  .menu-body {
+    max-width: 900px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+  }
+  .menu-list { list-style: none; display: flex; flex-direction: column; }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+  .menu-list li a {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 22px 0;
+    width: 100%;
+    text-align: left;
+    transition: padding-left 0.3s ease, color 0.25s ease;
+  }
+  .menu-list li a:hover,
+  .menu-list li a:focus-visible { padding-left: 16px; color: #888; outline: none; }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; font-variant-numeric: tabular-nums; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc {
+    font-size: 13px; color: #999; font-family: system-ui, -apple-system, sans-serif;
+    letter-spacing: 0.3px; max-width: 280px; text-align: right; line-height: 1.5; justify-self: end;
+  }
+  .menu-footer {
+    max-width: 900px;
+    width: 100%;
+    margin: 40px auto 0;
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    color: #bbb;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex-wrap: wrap;
+  }
+
+  /* ============ DISPOSICIÓN SITIOS DE CLASE ============ */
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 96px 24px 60px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* Panel base */
+  .panel {
+    background: #fff;
+    border: 1px solid #ececea;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+
+  /* Títulos de panel */
+  .panel-title {
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+
+  /* Cuadrícula de nombres */
+  .grid-names {
+    display: grid;
+    gap: 10px;
+  }
+  .panel-main .grid-names {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .panel-side .grid-names {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Botón / tarjeta de persona */
+  .name-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 8px;
+    background: #fdfdfd;
+    border: 1px solid #ececea;
+    border-radius: 10px;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s, color 0.2s;
+    cursor: pointer;
+  }
+  .name-card:hover {
+    background: #fff;
+    border-color: #111;
+    color: #111;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  }
+  .name-card:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .panel-side .grid-names {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; font-size: 12px; letter-spacing: 3px; }
+    .menu-body { justify-content: flex-start; }
+    .menu-list li a {
+      grid-template-columns: 40px 1fr;
+      gap: 14px;
+      padding: 18px 0;
+      align-items: center;
+    }
+    .menu-list li a:hover,
+    .menu-list li a:focus-visible { padding-left: 10px; }
+    .menu-list .num { font-size: 12px; }
+    .menu-list .label { font-size: clamp(24px, 7vw, 36px); letter-spacing: -0.8px; }
+    .menu-list .desc { display: none; }
+    .menu-footer { font-size: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    
+    .page { padding: 84px 16px 40px; }
+  }
+
+  @media (max-width: 640px) {
+    .panel-main .grid-names {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .panel-side .grid-names {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .name-card {
+      padding: 16px 6px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .menu-toggle { top: 14px; right: 14px; width: 44px; height: 44px; }
+    .mobile-menu { padding: 82px 20px 28px; }
+    .menu-header { left: 20px; top: 22px; }
+    
+    .page { padding: 78px 12px 32px; }
+    .panel { padding: 18px; border-radius: 14px; }
+    .grid-names { gap: 8px; }
+    
+    .panel-main .grid-names,
+    .panel-side .grid-names {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .name-card { padding: 14px 4px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+    <span class="bars"><span></span><span></span><span></span></span>
+  </button>
+
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos guardados</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Consulta tu horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Exámenes programados</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Próximo examen y lista</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora actual</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Compañeros y grupos</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos directos</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Velocidad al teclear</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Operaciones rápidas</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Reto de lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Juego de estrategia</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Palabra del día</span></a></li>
+      </ul>
+    </div>
+    <div class="menu-footer"><span>© 2025 Menú</span></div>
+  </div>
+
+  <div class="page">
+    <div class="layout">
+      
+      <!-- Panel Principal (Izquierda) -->
+      <div class="panel panel-main">
+        <div class="panel-title">Grupo Principal</div>
+        <div class="grid-names">
+          <a class="name-card" href="#">Pablo</a>
+          <a class="name-card" href="#">Fernando</a>
+          <a class="name-card" href="#">Juan</a>
+          <a class="name-card" href="#">Iago</a>
+          <a class="name-card" href="#">Airam</a>
+
+          <a class="name-card" href="#">Brais</a>
+          <a class="name-card" href="#">Brego</a>
+          <a class="name-card" href="#">Diego</a>
+          <a class="name-card" href="#">Alejandra</a>
+          <a class="name-card" href="#">Liam</a>
+
+          <a class="name-card" href="#">David</a>
+          <a class="name-card" href="#">Ivan</a>
+          <a class="name-card" href="#">Daniel</a>
+          <a class="name-card" href="#">Ares</a>
+          <a class="name-card" href="#">Pablo</a>
+
+          <a class="name-card" href="#">Adrian</a>
+          <a class="name-card" href="#">Alejandro</a>
+          <a class="name-card" href="#">Andres</a>
+          <a class="name-card" href="#">Breogan</a>
+          <!-- 5º hueco vacío en la última fila para mantener la forma -->
+        </div>
+      </div>
+
+      <!-- Panel Secundario (Derecha) -->
+      <div class="panel panel-side">
+        <div class="panel-title">Otros</div>
+        <div class="grid-names">
+          <a class="name-card" href="#">Brais</a>
+          <a class="name-card" href="#">Thiago</a>
+          <a class="name-card" href="#">Layla</a>
+
+          <a class="name-card" href="#">Simon</a>
+          <a class="name-card" href="#">Izan</a>
+          <a class="name-card" href="#">Iago</a>
+
+          <a class="name-card" href="#">Aitor</a>
+          <a class="name-card" href="#">Pedro</a>
+          <a class="name-card" href="#">David</a>
+
+          <a class="name-card" href="#">Carlos</a>
+          <a class="name-card" href="#">Ines</a>
+          <a class="name-card" href="#">Pablo</a>
+
+          <a class="name-card" href="#">Anxo</a>
+          <a class="name-card" href="#">Marc</a>
+          <a class="name-card" href="#">Gabriel</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const body = document.body;
+
+  function openMenu() {
+    body.classList.add('menu-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Cerrar menú');
+    const first = menu.querySelector('a');
+    if (first) setTimeout(() => first.focus(), 350);
+  }
+  function closeMenu() {
+    body.classList.remove('menu-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Abrir menú');
+    toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    body.classList.contains('menu-open') ? closeMenu() : openMenu();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) closeMenu();
+  });
+</script>
+</body>
+</html>

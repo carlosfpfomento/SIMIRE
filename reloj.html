@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reloj</title>
+<style>
+  /* ============ RESET Y BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #fafaf8;
+    color: #111;
+    min-height: 100vh;
+  }
+  body.menu-open { overflow: hidden; }
+  a { text-decoration: none; color: inherit; }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ BOTÓN HAMBURGUESA ============ */
+  .menu-toggle {
+    position: fixed;
+    top: 20px; right: 24px;
+    z-index: 300;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  }
+  .menu-toggle:hover { border-color: #111; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .menu-toggle:active { transform: scale(0.94); }
+  .menu-toggle .bars {
+    width: 22px; height: 15px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .menu-toggle .bars span {
+    display: block; height: 2px; width: 100%;
+    background: #111;
+    transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+    transform-origin: center;
+  }
+  body.menu-open .menu-toggle { background: #111; border-color: #111; }
+  body.menu-open .menu-toggle .bars span { background: #fff; }
+  body.menu-open .menu-toggle .bars span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  body.menu-open .menu-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.menu-open .menu-toggle .bars span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* ============ OVERLAY MENÚ ============ */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #fff;
+    padding: 100px 48px 48px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-16px);
+    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .menu-header {
+    position: absolute;
+    top: 30px; left: 48px;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #bbb;
+  }
+
+  .menu-body {
+    max-width: 900px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .menu-list li { border-top: 1px solid #eee; }
+  .menu-list li:last-child { border-bottom: 1px solid #eee; }
+
+  .menu-list li a {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 22px 0;
+    width: 100%;
+    text-align: left;
+    transition: padding-left 0.3s ease, color 0.25s ease;
+  }
+  .menu-list li a:hover,
+  .menu-list li a:focus-visible {
+    padding-left: 16px;
+    color: #888;
+    outline: none;
+  }
+  .menu-list .num { font-size: 13px; letter-spacing: 1px; color: #bbb; font-variant-numeric: tabular-nums; }
+  .menu-list .label { font-size: clamp(26px, 5vw, 46px); font-weight: 400; letter-spacing: -1.5px; line-height: 1.05; }
+  .menu-list .desc {
+    font-size: 13px; color: #999; font-family: system-ui, -apple-system, sans-serif;
+    letter-spacing: 0.3px; max-width: 280px; text-align: right; line-height: 1.5; justify-self: end;
+  }
+
+  .menu-footer {
+    max-width: 900px;
+    width: 100%;
+    margin: 40px auto 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    color: #bbb;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    flex-wrap: wrap;
+  }
+
+  /* ============ RELOJ ============ */
+  .page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 24px 60px;
+  }
+
+  .clock {
+    text-align: center;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  /* Hora grande */
+  .clock-time {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(72px, 18vw, 200px);
+    font-weight: 400;
+    letter-spacing: -6px;
+    line-height: 0.95;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.05em;
+    color: #111;
+  }
+  .clock-time .colon {
+    display: inline-block;
+    transform: translateY(-0.05em);
+    animation: blink 2s ease-in-out infinite;
+    color: #888;
+    font-weight: 300;
+  }
+  @keyframes blink {
+    0%, 45% { opacity: 1; }
+    50%, 95% { opacity: 0.25; }
+    100% { opacity: 1; }
+  }
+  .clock-time .sec {
+    font-size: 0.45em;
+    color: #888;
+    letter-spacing: -2px;
+    margin-left: 0.1em;
+  }
+
+  /* Separador */
+  .clock-divider {
+    width: 60px;
+    height: 1px;
+    background: #ddd;
+    margin: 32px auto;
+  }
+
+  /* Fecha */
+  .clock-date {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  .clock-weekday {
+    font-size: clamp(15px, 2.2vw, 19px);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 500;
+  }
+  .clock-full-date {
+    font-size: clamp(20px, 3vw, 32px);
+    letter-spacing: -0.5px;
+    color: #111;
+    font-weight: 400;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .clock-full-date .sep {
+    color: #bbb;
+    margin: 0 0.3em;
+    font-style: italic;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 860px) {
+    .mobile-menu { padding: 88px 24px 32px; }
+    .menu-header { top: 26px; left: 24px; font-size: 12px; letter-spacing: 3px; }
+
+    .menu-body { justify-content: flex-start; }
+    .menu-list li a {
+      grid-template-columns: 40px 1fr;
+      gap: 14px;
+      padding: 18px 0;
+      align-items: center;
+    }
+    .menu-list li a:hover,
+    .menu-list li a:focus-visible { padding-left: 10px; }
+    .menu-list .num { font-size: 12px; }
+    .menu-list .label { font-size: clamp(24px, 7vw, 36px); letter-spacing: -0.8px; }
+    .menu-list .desc { display: none; }
+
+    .menu-footer { font-size: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
+
+    .page { padding: 88px 20px 40px; }
+    .clock-time { letter-spacing: -4px; }
+    .clock-divider { margin: 24px auto; }
+  }
+
+  @media (max-width: 480px) {
+    .menu-toggle { top: 14px; right: 14px; width: 46px; height: 46px; }
+    .mobile-menu { padding: 82px 20px 28px; }
+    .menu-header { left: 20px; top: 22px; }
+
+    .page { padding: 82px 16px 32px; }
+    .clock-time { letter-spacing: -3px; }
+    .clock-weekday { letter-spacing: 3px; }
+    .clock-full-date .sep { margin: 0 0.15em; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .clock-time .colon { animation: none; opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ BOTÓN HAMBURGUESA ============ -->
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+    <span class="bars">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <!-- ============ MENÚ OVERLAY ============ -->
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+    <div class="menu-header">Menú</div>
+    <div class="menu-body">
+      <ul class="menu-list">
+        <li><a href="notificaciones.html"><span class="num">00</span><span class="label">Notificaciones</span><span class="desc">Avisos guardados en /notificaciones/</span></a></li>
+        <li><a href="horario.html"><span class="num">01</span><span class="label">Horario</span><span class="desc">Consulta tu horario semanal</span></a></li>
+        <li><a href="calendario.html"><span class="num">02</span><span class="label">Calendario</span><span class="desc">Organiza tus fechas importantes</span></a></li>
+        <li><a href="tareas.html"><span class="num">03</span><span class="label">Tareas</span><span class="desc">Gestiona tus pendientes</span></a></li>
+        <li><a href="reloj.html"><span class="num">04</span><span class="label">Reloj</span><span class="desc">Hora actual y cronómetro</span></a></li>
+        <li><a href="sitios-clase.html"><span class="num">05</span><span class="label">Sitios de clase</span><span class="desc">Plataformas y recursos del curso</span></a></li>
+        <li><a href="enlaces.html"><span class="num">06</span><span class="label">Enlaces</span><span class="desc">Accesos directos de interés</span></a></li>
+        <li><a href="mecanografia.html"><span class="num">07</span><span class="label">Mecanografía</span><span class="desc">Mejora tu velocidad al teclear</span></a></li>
+        <li><a href="calculadora.html"><span class="num">08</span><span class="label">Calculadora</span><span class="desc">Operaciones rápidas y sencillas</span></a></li>
+        <li><a href="sudoku.html"><span class="num">09</span><span class="label">Sudoku</span><span class="desc">Reto diario de lógica</span></a></li>
+        <li><a href="buscaminas.html"><span class="num">10</span><span class="label">Buscaminas</span><span class="desc">Clásico juego de estrategia</span></a></li>
+        <li><a href="wordle.html"><span class="num">11</span><span class="label">Wordle</span><span class="desc">Adivina la palabra del día</span></a></li>
+      </ul>
+    </div>
+    <div class="menu-footer"><span>© 2025 Menú</span></div>
+  </div>
+
+  <!-- ============ RELOJ ============ -->
+  <div class="page">
+    <div class="clock">
+      <div class="clock-time" aria-live="off">
+        <span id="hours">--</span>
+        <span class="colon">:</span>
+        <span id="minutes">--</span>
+        <span class="colon">:</span>
+        <span class="sec" id="seconds">--</span>
+      </div>
+
+      <div class="clock-divider"></div>
+
+      <div class="clock-date">
+        <div class="clock-weekday" id="weekday">—</div>
+        <div class="clock-full-date">
+          <span id="day">—</span>
+          <span class="sep">de</span>
+          <span id="month">—</span>
+          <span class="sep">de</span>
+          <span id="year">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  /* ============ MENÚ ============ */
+  const toggle = document.getElementById('menuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const body = document.body;
+
+  function openMenu() {
+    body.classList.add('menu-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Cerrar menú');
+    const first = menu.querySelector('a');
+    if (first) setTimeout(() => first.focus(), 350);
+  }
+  function closeMenu() {
+    body.classList.remove('menu-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Abrir menú');
+    toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    body.classList.contains('menu-open') ? closeMenu() : openMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) closeMenu();
+  });
+
+  /* ============ RELOJ ============ */
+  const elHours = document.getElementById('hours');
+  const elMinutes = document.getElementById('minutes');
+  const elSeconds = document.getElementById('seconds');
+  const elWeekday = document.getElementById('weekday');
+  const elDay = document.getElementById('day');
+  const elMonth = document.getElementById('month');
+  const elYear = document.getElementById('year');
+
+  const WEEKDAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateClock() {
+    const now = new Date();
+
+    elHours.textContent = pad(now.getHours());
+    elMinutes.textContent = pad(now.getMinutes());
+    elSeconds.textContent = pad(now.getSeconds());
+
+    elWeekday.textContent = WEEKDAYS[now.getDay()];
+    elDay.textContent = now.getDate();
+    elMonth.textContent = MONTHS[now.getMonth()];
+    elYear.textContent = now.getFullYear();
+
+    const msToNextSecond = 1000 - now.getMilliseconds();
+    setTimeout(updateClock, msToNextSecond);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updateClock();
+  });
+</script>
+</body>
+</html>

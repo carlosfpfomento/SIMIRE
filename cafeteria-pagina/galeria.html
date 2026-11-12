@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galería — Punto D Encuentro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="logo">Punto <span>D'</span>Encuentro</a>
+    <div class="nav-desktop">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="carta.html">Carta</a></li>
+        <li><a href="galeria.html" class="activo">Galería</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+      <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+        <svg class="ico-svg icon-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="ico-svg icon-luna" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+    <button class="hamburguesa" id="btnHamburguesa" aria-label="Abrir menú">
+      <svg class="ico-svg" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </header>
+
+  <div class="overlay-menu" id="overlayMenu"></div>
+  <nav class="menu-movil" id="menuMovil">
+    <button class="cierre" id="btnCerrarMenu" aria-label="Cerrar menú">
+      <svg class="ico-svg" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <ul>
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="carta.html">Carta</a></li>
+      <li><a href="galeria.html" class="activo">Galería</a></li>
+      <li><a href="contacto.html">Contacto</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggleMovil" style="margin-top:24px;width:100%;border-radius:12px;gap:10px;font-family:'Outfit',sans-serif;font-size:.85rem;letter-spacing:1px;">
+      <svg class="ico-svg icon-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="ico-svg icon-luna" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span>Modo claro/oscuro</span>
+    </button>
+  </nav>
+
+  <section style="padding-top:130px;">
+    <div class="section-title">
+      <div class="kicker">El ambiente</div>
+      <h2>Nuestro <em>espacio</em></h2>
+      <p>Un vistazo a los momentos que se viven aquí</p>
+      <div class="divider"></div>
+    </div>
+    <div class="galeria-grid">
+      <img class="grande" src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=1200&auto=format&fit=crop" alt="Café y ambiente">
+      <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop" alt="Taza de café">
+      <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=800&auto=format&fit=crop" alt="Café con leche">
+      <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=800&auto=format&fit=crop" alt="Barista preparando café">
+      <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=800&auto=format&fit=crop" alt="Granos de café">
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo-f">Punto <span>D'</span>Encuentro</div>
+    <p>Cafetería · Av. da Florida, 109 · Vigo</p>
+    <div class="social">
+      <a href="#" aria-label="Instagram"><svg class="ico-svg" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="#" aria-label="Facebook"><svg class="ico-svg" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+      <a href="#" aria-label="TikTok"><svg class="ico-svg" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+    </div>
+    <div class="copy">© 2025 Punto D'Encuentro · A Florida, Vigo</div>
+  </footer>
+
+  <script src="assets/script.js"></script>
+  <script>
+    document.getElementById('themeToggleMovil')?.addEventListener('click', () => {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('punto-encuentro-theme', next);
+    });
+  </script>
+</body>
+</html>

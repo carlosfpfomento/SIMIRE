@@ -35,7 +35,6 @@
     --cyan:#22d3ee;
     --green:#4ade80;
     --radius:14px;
-    --shadow-lg:0 24px 60px rgba(0,0,0,.55);
     --max:1200px;
     --header-h:64px;
   }
@@ -126,7 +125,7 @@
   .logo:hover .logo-mark { transform:rotate(180deg) scale(1.1); }
   .logo-mark svg { width:15px; height:15px; stroke:#0a0f1c; }
 
-  /* ============ BUSCADOR CENTRAL CON DROPDOWN ============ */
+  /* ============ BUSCADOR CON DROPDOWN ============ */
   .search-wrap {
     flex:1;
     max-width:520px;
@@ -167,7 +166,6 @@
   .search-clear:hover { background:rgba(255,255,255,.16); color:#fff; }
   .search-clear svg { width:11px; height:11px; }
 
-  /* Dropdown */
   .search-dropdown {
     position:absolute; top:calc(100% + 8px); left:0; right:0;
     background:rgba(14,18,34,.96);
@@ -220,17 +218,14 @@
   }
   .search-item-body { flex:1; min-width:0; }
   .search-item-title {
+    display:block;
     font-size:.85rem; font-weight:650; color:#fff;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .search-item-desc {
+    display:block;
     font-size:.72rem; color:var(--text-mute);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .search-item-title mark {
-    background:transparent;
-    color:var(--cyan);
-    font-weight:800;
   }
   .search-item-enter {
     font-size:.65rem; color:var(--text-mute);
@@ -249,24 +244,6 @@
   }
 
   .nav-right { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
-  .nav-cta {
-    padding:7px 16px;
-    background:linear-gradient(135deg, var(--violet), var(--pink));
-    color:#fff;
-    border-radius:8px; font-size:.82rem; font-weight:700;
-    transition:transform .15s, box-shadow .2s;
-    box-shadow:0 4px 14px rgba(168,85,247,.4);
-    position:relative; overflow:hidden;
-  }
-  .nav-cta span { position:relative; z-index:1; }
-  .nav-cta::before {
-    content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
-    transition:left .6s;
-  }
-  .nav-cta:hover::before { left:100%; }
-  .nav-cta:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(244,114,182,.5); }
-
   .menu-btn {
     display:none;
     width:38px; height:38px; border-radius:9px;
@@ -290,7 +267,6 @@
   .menu-btn.open span:nth-child(3) { top:18px; transform:translateX(-50%) rotate(-45deg); }
 
   @media (max-width: 780px) {
-    .nav-cta { display:none; }
     .menu-btn { display:flex; }
     .search-wrap { max-width:none; }
   }
@@ -540,7 +516,7 @@
     box-shadow:0 4px 14px rgba(168,85,247,.25);
   }
 
-  /* Grid de tarjetas MÁS COMPACTAS (nuevo) */
+  /* Grid */
   .grid {
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(196px, 1fr));
@@ -681,158 +657,7 @@
     .footer-brand { grid-column:1/-1; }
   }
 
-  /* ============ MODAL ============ */
-  .overlay {
-    position:fixed; inset:0; z-index:110;
-    background:rgba(4,6,16,.75);
-    backdrop-filter:blur(8px);
-    display:none; align-items:center; justify-content:center;
-    padding:20px;
-  }
-  .overlay.open { display:flex; }
-  .modal {
-    background:rgba(16,20,38,.95);
-    backdrop-filter:blur(28px) saturate(160%);
-    -webkit-backdrop-filter:blur(28px) saturate(160%);
-    border:1px solid var(--line);
-    border-radius:16px;
-    width:100%; max-width:520px; max-height:88vh;
-    overflow-y:auto;
-    box-shadow:var(--shadow-lg);
-    animation:modalIn .3s cubic-bezier(.2,.9,.3,1);
-    color:#fff;
-    position:relative;
-  }
-  .modal::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:3px;
-    background:linear-gradient(90deg, var(--pink), var(--violet), var(--cyan));
-    border-radius:16px 16px 0 0;
-    background-size:200% auto;
-    animation:gradShift 4s ease infinite;
-  }
-  @keyframes modalIn {
-    from { opacity:0; transform:translateY(16px) scale(.96); }
-    to   { opacity:1; transform:none; }
-  }
-  .modal-head {
-    display:flex; align-items:center; gap:12px;
-    padding:18px 20px;
-    border-bottom:1px solid var(--line-soft);
-    position:sticky; top:0; background:rgba(16,20,38,.98); z-index:2;
-    backdrop-filter:blur(28px);
-  }
-  .modal-head .card-icon { width:34px; height:34px; flex:0 0 34px; border-radius:9px; }
-  .modal-head .card-icon::before { opacity:1; }
-  .modal-head .card-icon svg { width:16px; height:16px; color:#fff; }
-  .modal-head h2 { font-size:1rem; font-weight:800; letter-spacing:-.015em; }
-  .modal-close {
-    margin-left:auto; width:32px; height:32px;
-    display:grid; place-items:center;
-    border:1px solid var(--line); background:rgba(255,255,255,.06);
-    border-radius:8px; color:var(--text-dim);
-    transition:background .15s, color .15s, transform .3s;
-  }
-  .modal-close:hover { background:rgba(248,113,113,.2); color:#fca5a5; transform:rotate(90deg); }
-  .modal-close svg { width:14px; height:14px; }
-  .modal-body { padding:20px; }
-
-  .field { margin-bottom:14px; }
-  .field label {
-    display:block; font-size:.78rem; font-weight:700;
-    color:var(--text-dim); margin-bottom:5px;
-  }
-  .field input, .field textarea, .field select {
-    width:100%; padding:9px 12px;
-    border:1px solid var(--line); border-radius:8px;
-    background:rgba(255,255,255,.06); font-size:.88rem; color:#fff;
-    font-family:inherit; outline:none;
-    transition:border-color .15s, box-shadow .15s, background .15s;
-  }
-  .field input::placeholder, .field textarea::placeholder { color:var(--text-mute); }
-  .field select option { background:#1a2038; color:#fff; }
-  .field textarea { resize:vertical; min-height:76px; }
-  .field input:focus, .field textarea:focus, .field select:focus {
-    border-color:var(--violet); background:rgba(255,255,255,.1);
-    box-shadow:0 0 0 3px rgba(168,85,247,.25);
-  }
-  .field .hint { font-size:.74rem; color:var(--text-mute); margin-top:4px; }
-
-  .btn-block { width:100%; justify-content:center; margin-top:4px; padding:10px 18px; }
-  .btn-block + .btn-block { margin-top:6px; }
-
-  .result {
-    margin-top:14px; padding:14px;
-    background:rgba(255,255,255,.05);
-    border:1px solid var(--line);
-    border-radius:9px;
-    font-size:.86rem; color:#fff;
-    display:none; word-break:break-word;
-    animation:resultIn .3s ease;
-  }
-  @keyframes resultIn {
-    from { opacity:0; transform:translateY(-6px); }
-    to   { opacity:1; transform:none; }
-  }
-  .result.show { display:block; }
-  .result .mono {
-    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size:.82rem;
-  }
-  .result pre {
-    white-space:pre-wrap;
-    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size:.78rem; margin:0;
-  }
-  .copy-line { display:flex; justify-content:flex-end; margin-top:8px; }
-  .copy-btn {
-    font-size:.74rem; font-weight:700;
-    padding:5px 10px; border-radius:6px;
-    border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--text-dim);
-    transition:all .15s;
-  }
-  .copy-btn:hover { border-color:var(--violet); color:#fff; background:rgba(168,85,247,.2); }
-  .copy-btn.done { color:#4ade80; border-color:rgba(74,222,128,.4); background:rgba(74,222,128,.15); }
-
-  .stat-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .stat {
-    background:rgba(255,255,255,.05); border:1px solid var(--line);
-    border-radius:9px; padding:11px;
-    transition:background .2s, border-color .2s, transform .2s;
-  }
-  .stat:hover { background:rgba(255,255,255,.08); border-color:rgba(168,85,247,.3); transform:translateY(-2px); }
-  .stat .k {
-    font-size:.66rem; text-transform:uppercase; letter-spacing:.05em;
-    color:var(--text-mute); font-weight:700;
-  }
-  .stat .v {
-    font-size:1.15rem; font-weight:800; color:#fff; margin-top:2px;
-    background:linear-gradient(135deg, #fff, #c4b5fd);
-    -webkit-background-clip:text; background-clip:text;
-    -webkit-text-fill-color:transparent;
-  }
-
-  .sw-display {
-    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size:2.2rem; text-align:center; padding:16px 0;
-    letter-spacing:.03em; font-weight:700;
-    background:linear-gradient(135deg, #f472b6, #a855f7, #22d3ee);
-    background-size:200% auto;
-    -webkit-background-clip:text; background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:gradShift 4s ease infinite;
-  }
-
-  .swatches { display:grid; gap:8px; }
-  .swatch { display:flex; align-items:center; gap:10px; }
-  .swatch .chipc {
-    width:34px; height:34px; border-radius:7px;
-    border:1px solid var(--line); flex:0 0 34px;
-    transition:transform .2s;
-  }
-  .swatch:hover .chipc { transform:scale(1.12) rotate(4deg); }
-  .swatch code { font-size:.78rem; color:var(--text-dim); }
-
-  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  button:focus-visible, a:focus-visible, input:focus-visible {
     outline:2px solid var(--violet); outline-offset:2px;
   }
 
@@ -878,7 +703,7 @@
 <!-- ================= HEADER ================= -->
 <header class="site-header" id="siteHeader">
   <nav class="nav">
-    <a class="logo" href="#">
+    <a class="logo" href="index.html">
       <span class="logo-mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2.7-2.7 2-2.6z"/>
@@ -887,7 +712,7 @@
       <span class="logo-text">MiniTools</span>
     </a>
 
-    <!-- BUSCADOR CENTRAL CON DROPDOWN -->
+    <!-- BUSCADOR CON DROPDOWN -->
     <div class="search-wrap">
       <div class="search-box">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -912,7 +737,6 @@
     </div>
 
     <div class="nav-right">
-      <button class="nav-cta" onclick="document.getElementById('herramientas').scrollIntoView()"><span>Explorar</span></button>
       <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -924,7 +748,7 @@
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
 <aside class="drawer" id="drawer" aria-label="Menú móvil">
   <div class="drawer-head">
-    <a class="logo" href="#">
+    <a class="logo" href="index.html">
       <span class="logo-mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2.7-2.7 2-2.6z"/>
@@ -966,7 +790,7 @@
         <a href="#acerca" class="btn btn-glass">Cómo funciona</a>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="k">Herramientas</div><div class="v">20+</div></div>
+        <div class="hero-stat"><div class="k">Herramientas</div><div class="v" id="statTools">2</div></div>
         <div class="hero-stat"><div class="k">Sin registros</div><div class="v">100%</div></div>
         <div class="hero-stat"><div class="k">Privacidad</div><div class="v">Total</div></div>
       </div>
@@ -983,14 +807,6 @@
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3"/></svg></div>
           <div class="ln"></div><div class="ln short"></div>
         </div>
-        <div class="hero-mock-card">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m8 8-5 4 5 4M16 8l5 4-5 4"/></svg></div>
-          <div class="ln"></div><div class="ln short"></div>
-        </div>
-        <div class="hero-mock-card">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 7h14"/></svg></div>
-          <div class="ln"></div><div class="ln short"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -1003,7 +819,7 @@
       <h2>Herramientas <span class="accent">disponibles</span></h2>
       <p>Selecciona una utilidad para empezar.</p>
     </div>
-    <span class="count-pill" id="countPill">20 herramientas</span>
+    <span class="count-pill" id="countPill">2 herramientas</span>
   </div>
 
   <div class="grid" id="grid"></div>
@@ -1013,7 +829,7 @@
 <footer class="site-footer" id="acerca">
   <div class="footer-inner">
     <div class="footer-brand">
-      <a class="logo" href="#">
+      <a class="logo" href="index.html">
         <span class="logo-mark">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2.7-2.7 2-2.6z"/>
@@ -1051,58 +867,17 @@
   <div class="footer-bottom">© 2024 MiniTools · Hecho con cuidado.</div>
 </footer>
 
-<!-- ================= MODAL ================= -->
-<div class="overlay" id="overlay" role="dialog" aria-modal="true">
-  <div class="modal" id="modal"></div>
-</div>
-
 <script>
 /* ============ ICONOS ============ */
 const icons = {
   text:  '<path d="M4 6h16M4 12h10M4 18h14"/>',
-  case:  '<path d="M4 7V5h8v2M8 5v14M6 19h4"/><path d="M14 12h6M14 17h6M14 12l3-5 3 5"/>',
-  key:   '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3m-3 3 3 3m-6 0 3 3"/>',
-  palette:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="9" r="1.4" fill="currentColor"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/>',
-  code:  '<path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>',
-  link:  '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
-  json:  '<path d="M8 4H6a2 2 0 0 0-2 2v4l-2 2 2 2v4a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v4l2 2-2 2v4a2 2 0 0 1-2 2h-2"/>',
-  regex: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>',
-  scale: '<path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0L7 7zm10 0-3 7a3 3 0 0 0 6 0l-3-7z"/>',
-  cake:  '<path d="M4 20h16v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6z"/><path d="M8 12V9m4 3V9m4 3V9M8 4l1 2m3-2 1 2m3-2 1 2"/>',
-  coin:  '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c.4-1 1.4-1.4 2.5-1.4 1.4 0 2.4.8 2.4 2s-1 1.7-2.4 2c-1.5.3-2.5 1-2.5 2.2 0 1.3 1 2 2.5 2 1.1 0 2.1-.4 2.5-1.4"/>',
-  ruler: '<path d="m3 17 14-14 4 4L7 21l-4-4z"/><path d="M7 13l2 2M11 9l2 2M15 5l2 2"/>',
-  dice:  '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r="1.2" fill="currentColor"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/>',
-  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  id:    '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c0-1.7 1.3-3 3-3s3 1.3 3 3M14 10h5M14 14h3"/>',
-  doc:   '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h5"/>',
-  swatch:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
-  qr:    '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v3M14 21h3M21 21h-3"/>',
-  stopwatch:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6M12 2v3"/>',
-  note:  '<path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h4"/>'
+  key:   '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3m-3 3 3 3m-6 0 3 3"/>'
 };
 
-/* ============ DATOS ============ */
+/* ============ DATOS (SOLO 2 HERRAMIENTAS) ============ */
 const tools = [
-  { id:'counter',    icon:'text',      title:'Contador de palabras',      desc:'Cuenta palabras, caracteres y líneas al instante.' },
-  { id:'case',       icon:'case',      title:'Conversor de mayúsculas',   desc:'MAYÚSCULAS, minúsculas, capitalizado o invertido.' },
-  { id:'lorem',      icon:'doc',       title:'Lorem Ipsum',               desc:'Genera texto de relleno por párrafos, frases o palabras.' },
-  { id:'password',   icon:'key',       title:'Generador de contraseñas',  desc:'Crea claves seguras con la longitud que quieras.' },
-  { id:'base64',     icon:'code',      title:'Base64 encode / decode',    desc:'Codifica y decodifica texto en Base64.' },
-  { id:'url',        icon:'link',      title:'URL encode / decode',       desc:'Codifica parámetros y URLs de forma segura.' },
-  { id:'json',       icon:'json',      title:'Formateador JSON',          desc:'Embellece y valida JSON con un clic.' },
-  { id:'regex',      icon:'regex',     title:'Tester de expresiones',     desc:'Prueba regex contra un texto y ve coincidencias.' },
-  { id:'uuid',       icon:'id',        title:'Generador UUID v4',         desc:'Crea identificadores únicos universales.' },
-  { id:'timestamp',  icon:'clock',     title:'Timestamp Unix',            desc:'Convierte entre fechas y timestamps Unix.' },
-  { id:'bmi',        icon:'scale',     title:'Calculadora de IMC',        desc:'Índice de masa corporal con clasificación.' },
-  { id:'age',        icon:'cake',      title:'Calculadora de edad',       desc:'Años, meses y días exactos desde tu nacimiento.' },
-  { id:'tip',        icon:'coin',      title:'Calculadora de propina',    desc:'Divide la cuenta y calcula la propina por persona.' },
-  { id:'length',     icon:'ruler',     title:'Conversor de unidades',     desc:'Longitud entre metros, pies, millas y más.' },
-  { id:'random',     icon:'dice',      title:'Número aleatorio',          desc:'Genera un entero aleatorio en el rango que elijas.' },
-  { id:'color',      icon:'palette',   title:'Selector de colores',       desc:'HEX, RGB y HSL de cualquier color.' },
-  { id:'colorpicker',icon:'swatch',    title:'Paleta de colores',         desc:'Genera una paleta armónica aleatoria.' },
-  { id:'qr',         icon:'qr',        title:'Generador de QR',           desc:'Convierte texto o URLs en un código QR.' },
-  { id:'stopwatch',  icon:'stopwatch', title:'Cronómetro',                desc:'Mide el tiempo con precisión de milisegundos.' },
-  { id:'notes',      icon:'note',      title:'Bloc de notas',             desc:'Notas rápidas guardadas en tu navegador.' }
+  { id:'counter',  file:'contador-de-palabras.html',      icon:'text', title:'Contador de palabras',     desc:'Cuenta palabras, caracteres y líneas al instante.' },
+  { id:'password', file:'generador-de-contrasenas.html',  icon:'key',  title:'Generador de contraseñas', desc:'Crea claves seguras con la longitud que quieras.' }
 ];
 
 const svg = inner => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
@@ -1142,26 +917,19 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDrawer()
 drawer.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeDrawer));
 
 /* ============================================================
-   BUSCADOR CON DROPDOWN EN VIVO
+   BUSCADOR CON DROPDOWN
    ============================================================ */
 const searchInput = document.getElementById('searchInput');
 const searchClear = document.getElementById('searchClear');
 const searchDropdown = document.getElementById('searchDropdown');
 const grid = document.getElementById('grid');
 const countPill = document.getElementById('countPill');
+const statTools = document.getElementById('statTools');
 
 let currentQuery = '';
-let activeIndex = -1; // índice dentro del dropdown
-let currentResults = []; // resultados actuales del dropdown
+let activeIndex = -1;
+let currentResults = [];
 
-/* --- Resalta el texto coincidente --- */
-function highlight(text, query){
-  if(!query) return text;
-  const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
-  return text.replace(re, '<mark>$1</mark>');
-}
-
-/* --- Construye y muestra el dropdown --- */
 function renderDropdown(query){
   const q = query.trim().toLowerCase();
   if(!q){
@@ -1192,39 +960,19 @@ function renderDropdown(query){
   let html = `<div class="search-dropdown-label">${results.length} ${results.length === 1 ? 'resultado' : 'resultados'}</div>`;
   results.forEach((t, i) => {
     html += `
-      <button class="search-item" data-index="${i}" data-id="${t.id}" type="button" role="option">
+      <a class="search-item" href="${t.file}" data-index="${i}" role="option">
         <span class="search-item-icon">${svg(icons[t.icon] || icons.text)}</span>
         <span class="search-item-body">
-          <span class="search-item-title">${highlight(t.title, query)}</span>
-          <span class="search-item-desc">${highlight(t.desc, query)}</span>
+          <span class="search-item-title">${escapeHtml(t.title)}</span>
+          <span class="search-item-desc">${escapeHtml(t.desc)}</span>
         </span>
         <span class="search-item-enter">↵</span>
-      </button>`;
+      </a>`;
   });
   searchDropdown.innerHTML = html;
   searchDropdown.classList.add('open');
-
-  // Eventos en cada item
-  searchDropdown.querySelectorAll('.search-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const id = item.dataset.id;
-      const tool = tools.find(x => x.id === id);
-      if(tool){
-        // Escribimos el nombre en el buscador
-        searchInput.value = tool.title;
-        currentQuery = tool.title.toLowerCase();
-        filterGrid();
-        updateClearButton();
-        // Cerramos el dropdown
-        searchDropdown.classList.remove('open');
-        // Y abrimos la herramienta
-        openTool(id);
-      }
-    });
-  });
 }
 
-/* --- Navegación por teclado --- */
 function moveActive(dir){
   if(!searchDropdown.classList.contains('open') || !currentResults.length) return;
   activeIndex += dir;
@@ -1232,23 +980,15 @@ function moveActive(dir){
   if(activeIndex >= currentResults.length) activeIndex = 0;
   const items = searchDropdown.querySelectorAll('.search-item');
   items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
-  // Scroll al elemento activo
   const active = items[activeIndex];
   if(active) active.scrollIntoView({ block:'nearest' });
 }
 
 function selectActive(){
   if(activeIndex < 0 || !currentResults[activeIndex]) return;
-  const t = currentResults[activeIndex];
-  searchInput.value = t.title;
-  currentQuery = t.title.toLowerCase();
-  filterGrid();
-  updateClearButton();
-  searchDropdown.classList.remove('open');
-  openTool(t.id);
+  window.location.href = currentResults[activeIndex].file;
 }
 
-/* --- Filtra el grid principal --- */
 function filterGrid(){
   const q = currentQuery.trim().toLowerCase();
   const list = tools.filter(t =>
@@ -1256,26 +996,26 @@ function filterGrid(){
   );
   grid.innerHTML = '';
   countPill.textContent = list.length + (list.length === 1 ? ' herramienta' : ' herramientas');
+  if(statTools) statTools.textContent = list.length;
 
   if(!list.length){
     grid.innerHTML = '<div class="empty">No se han encontrado herramientas para esa búsqueda.</div>';
     return;
   }
   list.forEach((t, i) => {
-    const card = document.createElement('button');
+    const card = document.createElement('a');
     card.className = 'card';
+    card.href = t.file;
     card.style.animationDelay = (i * 25) + 'ms';
-    card.type = 'button';
     card.innerHTML = `
       <div class="card-top">
         <div class="card-icon">${svg(icons[t.icon] || icons.text)}</div>
       </div>
-      <h3>${t.title}</h3>
-      <p>${t.desc}</p>
+      <h3>${escapeHtml(t.title)}</h3>
+      <p>${escapeHtml(t.desc)}</p>
       <span class="card-open">Abrir
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </span>`;
-    card.onclick = () => openTool(t.id);
     grid.appendChild(card);
   });
 }
@@ -1284,7 +1024,6 @@ function updateClearButton(){
   searchClear.classList.toggle('show', searchInput.value.length > 0);
 }
 
-/* --- Eventos --- */
 searchInput.addEventListener('input', e => {
   currentQuery = e.target.value;
   renderDropdown(e.target.value);
@@ -1312,535 +1051,19 @@ searchClear.addEventListener('click', () => {
   searchInput.focus();
 });
 
-// Cerrar dropdown al hacer clic fuera
 document.addEventListener('click', e => {
   if(!e.target.closest('.search-wrap')){
     searchDropdown.classList.remove('open');
   }
 });
 
+/* --- Helpers --- */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 /* --- Render inicial --- */
 filterGrid();
-
-/* ============ MODAL ============ */
-const overlay = document.getElementById('overlay');
-const modal = document.getElementById('modal');
-let stopwatchTimer = null;
-
-function openTool(id){
-  const t = tools.find(x => x.id === id);
-  modal.innerHTML = `
-    <div class="modal-head">
-      <div class="card-icon">${svg(icons[t.icon] || icons.text)}</div>
-      <div>
-        <h2>${t.title}</h2>
-      </div>
-      <button class="modal-close" aria-label="Cerrar" onclick="closeModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">${bodyFor(id)}</div>
-  `;
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  bind(id);
-}
-
-function closeModal(){
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
-  if(stopwatchTimer){ clearInterval(stopwatchTimer); stopwatchTimer = null; }
-}
-overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
-
-/* ============ HELPERS ============ */
-function showResult(id, html){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.add('show');
-  el.innerHTML = html + `<div class="copy-line"><button class="copy-btn" type="button">Copiar</button></div>`;
-  const btn = el.querySelector('.copy-btn');
-  btn.onclick = () => {
-    const text = el.querySelector('.payload')?.innerText ?? el.innerText;
-    navigator.clipboard.writeText(text).then(() => {
-      btn.textContent = '✓ Copiado';
-      btn.classList.add('done');
-      setTimeout(() => { btn.textContent='Copiar'; btn.classList.remove('done'); }, 1400);
-    });
-  };
-}
-const mono = s => `<div class="payload mono">${escapeHtml(s)}</div>`;
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* ============ CUERPO ============ */
-function bodyFor(id){
-  switch(id){
-    case 'counter': return `
-      <div class="field">
-        <label for="wcInput">Texto</label>
-        <textarea id="wcInput" placeholder="Escribe o pega tu texto…"></textarea>
-      </div>
-      <div class="stat-row">
-        <div class="stat"><div class="k">Palabras</div><div class="v" id="wcWords">0</div></div>
-        <div class="stat"><div class="k">Caracteres</div><div class="v" id="wcChars">0</div></div>
-        <div class="stat"><div class="k">Sin espacios</div><div class="v" id="wcNoSpace">0</div></div>
-        <div class="stat"><div class="k">Líneas</div><div class="v" id="wcLines">0</div></div>
-      </div>`;
-    case 'case': return `
-      <div class="field"><label for="caseInput">Texto</label><textarea id="caseInput" placeholder="Escribe tu texto…"></textarea></div>
-      <div class="field"><label for="caseType">Formato</label>
-        <select id="caseType">
-          <option value="upper">MAYÚSCULAS</option>
-          <option value="lower">minúsculas</option>
-          <option value="title">Capitalizar Cada Palabra</option>
-          <option value="sentence">Solo primera letra</option>
-          <option value="reverse">Invertir texto</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-block" id="caseBtn" type="button"><span>Convertir</span></button>
-      <div class="result" id="caseResult"></div>`;
-    case 'password': return `
-      <div class="field"><label for="pwLength">Longitud</label><input type="number" id="pwLength" value="16" min="4" max="64"></div>
-      <div class="field"><label for="pwOpts">Caracteres incluidos</label>
-        <select id="pwOpts">
-          <option value="lower">Solo minúsculas</option>
-          <option value="lower-upper">Minúsculas y mayúsculas</option>
-          <option value="lower-upper-num">+ Números</option>
-          <option value="all" selected>Todo (recomendado)</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-block" id="pwBtn" type="button"><span>Generar contraseña</span></button>
-      <div class="result" id="pwResult"></div>`;
-    case 'lorem': return `
-      <div class="field"><label for="loremCount">Cantidad</label><input type="number" id="loremCount" value="3" min="1" max="50"></div>
-      <div class="field"><label for="loremType">Tipo</label>
-        <select id="loremType">
-          <option value="paragraphs">Párrafos</option>
-          <option value="sentences">Oraciones</option>
-          <option value="words">Palabras</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-block" id="loremBtn" type="button"><span>Generar</span></button>
-      <div class="result" id="loremResult"></div>`;
-    case 'base64': return `
-      <div class="field"><label for="b64Input">Texto</label><textarea id="b64Input" placeholder="Texto a codificar o Base64 a decodificar…"></textarea></div>
-      <div class="field"><label for="b64Mode">Modo</label>
-        <select id="b64Mode">
-          <option value="encode">Codificar (texto → Base64)</option>
-          <option value="decode">Decodificar (Base64 → texto)</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-block" id="b64Btn" type="button"><span>Procesar</span></button>
-      <div class="result" id="b64Result"></div>`;
-    case 'url': return `
-      <div class="field"><label for="urlInput">Texto o URL</label><textarea id="urlInput" placeholder="https://ejemplo.com?buscar=hola mundo"></textarea></div>
-      <div class="field"><label for="urlMode">Modo</label>
-        <select id="urlMode">
-          <option value="encode">Codificar</option>
-          <option value="decode">Decodificar</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-block" id="urlBtn" type="button"><span>Procesar</span></button>
-      <div class="result" id="urlResult"></div>`;
-    case 'json': return `
-      <div class="field"><label for="jsonInput">JSON</label><textarea id="jsonInput" placeholder='{"nombre":"Ana","edad":29}'></textarea></div>
-      <button class="btn btn-primary btn-block" id="jsonBtn" type="button"><span>Formatear</span></button>
-      <div class="result" id="jsonResult"></div>`;
-    case 'regex': return `
-      <div class="field"><label for="regexPattern">Patrón (sin barras)</label><input type="text" id="regexPattern" value="\\w+" placeholder="\\d+"></div>
-      <div class="field"><label for="regexFlags">Flags</label><input type="text" id="regexFlags" value="g" placeholder="g, i, m"></div>
-      <div class="field"><label for="regexText">Texto de prueba</label><textarea id="regexText">Hola mundo 123</textarea></div>
-      <button class="btn btn-primary btn-block" id="regexBtn" type="button"><span>Probar</span></button>
-      <div class="result" id="regexResult"></div>`;
-    case 'uuid': return `
-      <p style="color:var(--text-mute);font-size:.86rem;margin-bottom:12px;">Genera un identificador único versión 4.</p>
-      <button class="btn btn-primary btn-block" id="uuidBtn" type="button"><span>Generar UUID</span></button>
-      <div class="result" id="uuidResult"></div>`;
-    case 'timestamp': return `
-      <div class="field"><label for="tsInput">Timestamp o fecha</label>
-        <input type="text" id="tsInput" placeholder="1700000000 o 2024-01-01">
-        <div class="hint">Déjalo vacío para ver la hora actual.</div>
-      </div>
-      <button class="btn btn-primary btn-block" id="tsBtn" type="button"><span>Convertir</span></button>
-      <div class="result" id="tsResult"></div>`;
-    case 'bmi': return `
-      <div class="field"><label for="bmiWeight">Peso (kg)</label><input type="number" id="bmiWeight" placeholder="70" step="0.1"></div>
-      <div class="field"><label for="bmiHeight">Altura (cm)</label><input type="number" id="bmiHeight" placeholder="175"></div>
-      <button class="btn btn-primary btn-block" id="bmiBtn" type="button"><span>Calcular IMC</span></button>
-      <div class="result" id="bmiResult"></div>`;
-    case 'age': return `
-      <div class="field"><label for="ageInput">Fecha de nacimiento</label><input type="date" id="ageInput"></div>
-      <button class="btn btn-primary btn-block" id="ageBtn" type="button"><span>Calcular edad</span></button>
-      <div class="result" id="ageResult"></div>`;
-    case 'tip': return `
-      <div class="field"><label for="tipBill">Cuenta total</label><input type="number" id="tipBill" placeholder="50" step="0.01"></div>
-      <div class="field"><label for="tipPct">Propina (%)</label><input type="number" id="tipPct" value="15"></div>
-      <div class="field"><label for="tipPeople">Número de personas</label><input type="number" id="tipPeople" value="1" min="1"></div>
-      <button class="btn btn-primary btn-block" id="tipBtn" type="button"><span>Calcular</span></button>
-      <div class="result" id="tipResult"></div>`;
-    case 'length': return `
-      <div class="field"><label for="lengthVal">Valor</label><input type="number" id="lengthVal" placeholder="100"></div>
-      <div class="field"><label for="lengthFrom">De</label>
-        <select id="lengthFrom">
-          <option value="m">Metros</option><option value="km">Kilómetros</option>
-          <option value="cm">Centímetros</option><option value="mm">Milímetros</option>
-          <option value="mi">Millas</option><option value="ft">Pies</option>
-          <option value="in">Pulgadas</option><option value="yd">Yardas</option>
-        </select>
-      </div>
-      <div class="field"><label for="lengthTo">A</label>
-        <select id="lengthTo">
-          <option value="km">Kilómetros</option><option value="m">Metros</option>
-          <option value="cm">Centímetros</option><option value="mm">Milímetros</option>
-          <option value="mi">Millas</option><option value="ft">Pies</option>
-          <option value="in">Pulgadas</option><option value="yd">Yardas</option>
-        </select>
-      </div>
-      <button class="btn btn-primary btn-block" id="lengthBtn" type="button"><span>Convertir</span></button>
-      <div class="result" id="lengthResult"></div>`;
-    case 'random': return `
-      <div class="field"><label for="randMin">Mínimo</label><input type="number" id="randMin" value="1"></div>
-      <div class="field"><label for="randMax">Máximo</label><input type="number" id="randMax" value="100"></div>
-      <button class="btn btn-primary btn-block" id="randomBtn" type="button"><span>Generar número</span></button>
-      <div class="result" id="randomResult"></div>`;
-    case 'color': return `
-      <div class="field"><label for="colorInput">Color</label><input type="color" id="colorInput" value="#a855f7" style="height:48px;padding:4px;"></div>
-      <div class="result show" id="colorResult"></div>`;
-    case 'colorpicker': return `
-      <p style="color:var(--text-mute);font-size:.86rem;margin-bottom:12px;">Paleta de cinco colores generada al azar.</p>
-      <button class="btn btn-primary btn-block" id="paletteBtn" type="button"><span>Nueva paleta</span></button>
-      <div class="result" id="paletteResult"></div>`;
-    case 'qr': return `
-      <div class="field"><label for="qrInput">Texto o URL</label><input type="text" id="qrInput" value="https://ejemplo.com"></div>
-      <div class="field"><label for="qrSize">Tamaño (px)</label><input type="number" id="qrSize" value="220" min="100" max="500"></div>
-      <button class="btn btn-primary btn-block" id="qrBtn" type="button"><span>Generar QR</span></button>
-      <div class="result" id="qrResult"></div>`;
-    case 'stopwatch': return `
-      <div class="sw-display" id="swDisplay">00:00:00.000</div>
-      <button class="btn btn-primary btn-block" id="swBtn" type="button"><span>Iniciar</span></button>
-      <button class="btn btn-glass btn-block" id="swReset" type="button">Reiniciar</button>`;
-    case 'notes': return `
-      <div class="field"><label for="notesInput">Notas (se guardan en tu navegador)</label>
-        <textarea id="notesInput" rows="8" placeholder="Escribe aquí…"></textarea>
-        <div class="hint" id="notesStatus"></div>
-      </div>`;
-  }
-  return '<p>Herramienta no disponible.</p>';
-}
-
-/* ============ BIND ============ */
-function bind(id){
-  switch(id){
-    case 'counter': {
-      const inp = document.getElementById('wcInput');
-      const upd = () => {
-        const t = inp.value;
-        document.getElementById('wcWords').textContent   = t.trim() ? t.trim().split(/\s+/).length : 0;
-        document.getElementById('wcChars').textContent   = t.length;
-        document.getElementById('wcNoSpace').textContent = t.replace(/\s/g,'').length;
-        document.getElementById('wcLines').textContent   = t ? t.split('\n').length : 0;
-      };
-      inp.addEventListener('input', upd); upd(); break;
-    }
-    case 'case': {
-      document.getElementById('caseBtn').onclick = () => {
-        const v = document.getElementById('caseInput').value;
-        const t = document.getElementById('caseType').value;
-        let r = v;
-        if(t === 'upper') r = v.toUpperCase();
-        else if(t === 'lower') r = v.toLowerCase();
-        else if(t === 'title') r = v.replace(/\S+/g, w => w[0].toUpperCase()+w.slice(1).toLowerCase());
-        else if(t === 'sentence') r = v ? v[0].toUpperCase()+v.slice(1).toLowerCase() : '';
-        else if(t === 'reverse') r = v.split('').reverse().join('');
-        showResult('caseResult', mono(r));
-      }; break;
-    }
-    case 'password': {
-      document.getElementById('pwBtn').onclick = () => {
-        const len = parseInt(document.getElementById('pwLength').value) || 16;
-        const opt = document.getElementById('pwOpts').value;
-        let chars = 'abcdefghijklmnopqrstuvwxyz';
-        if(opt !== 'lower') chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if(opt === 'lower-upper-num' || opt === 'all') chars += '0123456789';
-        if(opt === 'all') chars += '!@#$%^&*()-_=+[]{};:,.?';
-        let pw = '';
-        const c = window.crypto || window.msCrypto;
-        if(c && c.getRandomValues){
-          const arr = new Uint32Array(len); c.getRandomValues(arr);
-          pw = [...arr].map(n => chars[n % chars.length]).join('');
-        } else {
-          for(let i=0;i<len;i++) pw += chars[Math.floor(Math.random()*chars.length)];
-        }
-        showResult('pwResult', mono(pw));
-      }; break;
-    }
-    case 'lorem': {
-      document.getElementById('loremBtn').onclick = () => {
-        const n = Math.min(50, Math.max(1, parseInt(document.getElementById('loremCount').value)||3));
-        const type = document.getElementById('loremType').value;
-        const dict = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'.split(' ');
-        const rnd = () => dict[Math.floor(Math.random()*dict.length)];
-        let out = '';
-        if(type === 'words') out = Array.from({length:n}, rnd).join(' ');
-        else if(type === 'sentences') {
-          const parts = [];
-          for(let i=0;i<n;i++){
-            const w = Array.from({length:8+Math.floor(Math.random()*6)}, rnd);
-            parts.push(w[0][0].toUpperCase()+w.join(' ').slice(1) + '.');
-          }
-          out = parts.join(' ');
-        } else {
-          const paras = [];
-          for(let i=0;i<n;i++){
-            const sents = [];
-            for(let j=0;j<4;j++){
-              const w = Array.from({length:8+Math.floor(Math.random()*6)}, rnd);
-              sents.push(w[0][0].toUpperCase()+w.join(' ').slice(1) + '.');
-            }
-            paras.push(sents.join(' '));
-          }
-          out = paras.join('\n\n');
-        }
-        showResult('loremResult', mono(out));
-      }; break;
-    }
-    case 'base64': {
-      document.getElementById('b64Btn').onclick = () => {
-        const v = document.getElementById('b64Input').value;
-        const m = document.getElementById('b64Mode').value;
-        try {
-          const r = m === 'encode' ? btoa(unescape(encodeURIComponent(v))) : decodeURIComponent(escape(atob(v)));
-          showResult('b64Result', mono(r));
-        } catch(e){
-          showResult('b64Result', '<span style="color:#f87171">Entrada inválida.</span>');
-        }
-      }; break;
-    }
-    case 'url': {
-      document.getElementById('urlBtn').onclick = () => {
-        const v = document.getElementById('urlInput').value;
-        const m = document.getElementById('urlMode').value;
-        try {
-          const r = m === 'encode' ? encodeURIComponent(v) : decodeURIComponent(v);
-          showResult('urlResult', mono(r));
-        } catch(e){
-          showResult('urlResult', '<span style="color:#f87171">URL inválida.</span>');
-        }
-      }; break;
-    }
-    case 'json': {
-      document.getElementById('jsonBtn').onclick = () => {
-        const v = document.getElementById('jsonInput').value;
-        try {
-          const obj = JSON.parse(v);
-          showResult('jsonResult', '<pre class="payload">'+escapeHtml(JSON.stringify(obj,null,2))+'</pre>');
-        } catch(e){
-          showResult('jsonResult', '<span style="color:#f87171">JSON inválido: '+escapeHtml(e.message)+'</span>');
-        }
-      }; break;
-    }
-    case 'regex': {
-      document.getElementById('regexBtn').onclick = () => {
-        const p = document.getElementById('regexPattern').value;
-        let f = document.getElementById('regexFlags').value || 'g';
-        if(!f.includes('g')) f += 'g';
-        const t = document.getElementById('regexText').value;
-        try {
-          const re = new RegExp(p, f);
-          const matches = [...t.matchAll(re)];
-          if(!matches.length) showResult('regexResult', 'Sin coincidencias.');
-          else {
-            const list = matches.map((m,i)=>`${i+1}. "${escapeHtml(m[0])}" (índice ${m.index})`).join('<br>');
-            showResult('regexResult', `<div class="payload">${matches.length} coincidencia(s):<br>${list}</div>`);
-          }
-        } catch(e){
-          showResult('regexResult', '<span style="color:#f87171">Expresión inválida: '+escapeHtml(e.message)+'</span>');
-        }
-      }; break;
-    }
-    case 'uuid': {
-      document.getElementById('uuidBtn').onclick = () => {
-        const u = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          const r = Math.random()*16|0;
-          const v = c === 'x' ? r : (r&0x3|0x8);
-          return v.toString(16);
-        });
-        showResult('uuidResult', mono(u));
-      }; break;
-    }
-    case 'timestamp': {
-      document.getElementById('tsBtn').onclick = () => {
-        const v = document.getElementById('tsInput').value.trim();
-        if(!v){
-          showResult('tsResult', mono('Ahora: '+Math.floor(Date.now()/1000)));
-          return;
-        }
-        if(/^\d+$/.test(v)){
-          const d = new Date(parseInt(v)*1000);
-          showResult('tsResult', mono(d.toLocaleString()+'\nISO: '+d.toISOString()));
-        } else {
-          const d = new Date(v);
-          if(isNaN(d)) return showResult('tsResult','<span style="color:#f87171">Formato inválido.</span>');
-          showResult('tsResult', mono('Timestamp: '+Math.floor(d.getTime()/1000)));
-        }
-      }; break;
-    }
-    case 'bmi': {
-      document.getElementById('bmiBtn').onclick = () => {
-        const w = parseFloat(document.getElementById('bmiWeight').value);
-        const h = parseFloat(document.getElementById('bmiHeight').value)/100;
-        if(!w || !h) return showResult('bmiResult','<span style="color:#f87171">Introduce peso y altura válidos.</span>');
-        const b = w/(h*h);
-        let cat, color;
-        if(b<18.5){ cat='Bajo peso'; color='#60a5fa'; }
-        else if(b<25){ cat='Normal'; color='#4ade80'; }
-        else if(b<30){ cat='Sobrepeso'; color='#fbbf24'; }
-        else { cat='Obesidad'; color='#f87171'; }
-        showResult('bmiResult', `<div class="payload"><strong style="font-size:1.3rem;color:${color}">${b.toFixed(1)}</strong> · ${cat}</div>`);
-      }; break;
-    }
-    case 'age': {
-      document.getElementById('ageBtn').onclick = () => {
-        const v = document.getElementById('ageInput').value;
-        if(!v) return showResult('ageResult','<span style="color:#f87171">Selecciona una fecha.</span>');
-        const b = new Date(v), n = new Date();
-        let y = n.getFullYear()-b.getFullYear(), m = n.getMonth()-b.getMonth(), d = n.getDate()-b.getDate();
-        if(d<0){ m--; d += new Date(n.getFullYear(), n.getMonth(), 0).getDate(); }
-        if(m<0){ y--; m+=12; }
-        const days = Math.floor((n-b)/86400000);
-        showResult('ageResult', `<div class="payload"><strong>${y}</strong> años, <strong>${m}</strong> meses, <strong>${d}</strong> días<br><span style="color:var(--text-mute)">Total: ${days.toLocaleString()} días</span></div>`);
-      }; break;
-    }
-    case 'tip': {
-      document.getElementById('tipBtn').onclick = () => {
-        const bill = parseFloat(document.getElementById('tipBill').value);
-        const pct  = parseFloat(document.getElementById('tipPct').value);
-        const ppl  = Math.max(1, parseInt(document.getElementById('tipPeople').value)||1);
-        if(!bill || !pct) return showResult('tipResult','<span style="color:#f87171">Introduce la cuenta y el porcentaje.</span>');
-        const tip = bill*pct/100, total = bill+tip, per = total/ppl;
-        showResult('tipResult', `<div class="payload">Cuenta: ${bill.toFixed(2)}<br>Propina (${pct}%): ${tip.toFixed(2)}<br>Total: <strong>${total.toFixed(2)}</strong><br>Por persona: <strong>${per.toFixed(2)}</strong></div>`);
-      }; break;
-    }
-    case 'length': {
-      document.getElementById('lengthBtn').onclick = () => {
-        const v = parseFloat(document.getElementById('lengthVal').value);
-        const f = document.getElementById('lengthFrom').value;
-        const t = document.getElementById('lengthTo').value;
-        if(isNaN(v)) return showResult('lengthResult','<span style="color:#f87171">Introduce un valor numérico.</span>');
-        const K = { m:1, km:1000, cm:0.01, mm:0.001, mi:1609.344, ft:0.3048, in:0.0254, yd:0.9144 };
-        const r = v*K[f]/K[t];
-        showResult('lengthResult', mono(`${v} ${f} = ${r.toFixed(4)} ${t}`));
-      }; break;
-    }
-    case 'random': {
-      document.getElementById('randomBtn').onclick = () => {
-        const a = parseInt(document.getElementById('randMin').value)||0;
-        const b = parseInt(document.getElementById('randMax').value)||100;
-        const lo = Math.min(a,b), hi = Math.max(a,b);
-        const n = Math.floor(Math.random()*(hi-lo+1))+lo;
-        showResult('randomResult', mono(String(n)));
-      }; break;
-    }
-    case 'color': {
-      const inp = document.getElementById('colorInput');
-      const upd = () => {
-        const hex = inp.value;
-        const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-        const [h,s,l] = rgbToHsl(r,g,b);
-        document.getElementById('colorResult').innerHTML = `
-          <div class="payload">
-            <div style="height:48px;border-radius:9px;border:1px solid var(--line);background:${hex};margin-bottom:10px"></div>
-            HEX: <strong>${hex.toUpperCase()}</strong><br>
-            RGB: <strong>rgb(${r}, ${g}, ${b})</strong><br>
-            HSL: <strong>hsl(${h}, ${s}%, ${l}%)</strong>
-          </div>`;
-        document.getElementById('colorResult').classList.add('show');
-      };
-      inp.addEventListener('input', upd); upd(); break;
-    }
-    case 'colorpicker': {
-      const go = () => {
-        const rows = [];
-        for(let i=0;i<5;i++){
-          const h = Math.floor(Math.random()*360);
-          const s = 60+Math.floor(Math.random()*30);
-          const l = 55+Math.floor(Math.random()*20);
-          const css = `hsl(${h}, ${s}%, ${l}%)`;
-          rows.push(`<div class="swatch"><div class="chipc" style="background:${css}"></div><code>${css}</code></div>`);
-        }
-        document.getElementById('paletteResult').innerHTML = `<div class="payload swatches">${rows.join('')}</div>`;
-        document.getElementById('paletteResult').classList.add('show');
-      };
-      document.getElementById('paletteBtn').onclick = go; go(); break;
-    }
-    case 'qr': {
-      document.getElementById('qrBtn').onclick = () => {
-        const v = document.getElementById('qrInput').value.trim();
-        const sz = Math.min(500, Math.max(100, parseInt(document.getElementById('qrSize').value)||220));
-        if(!v) return;
-        const img = `https://api.qrserver.com/v1/create-qr-code/?size=${sz}x${sz}&data=${encodeURIComponent(v)}`;
-        showResult('qrResult', `<img class="payload" src="${img}" alt="Código QR" style="max-width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;padding:8px">`);
-      }; break;
-    }
-    case 'stopwatch': {
-      let running = false, elapsed = 0, start = 0;
-      const disp = document.getElementById('swDisplay');
-      const btn = document.getElementById('swBtn');
-      const reset = document.getElementById('swReset');
-      const fmt = ms => {
-        const mss = ms%1000, s = Math.floor(ms/1000)%60, m = Math.floor(ms/60000)%60, h = Math.floor(ms/3600000);
-        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(mss).padStart(3,'0')}`;
-      };
-      const btnSpan = btn.querySelector('span');
-      btn.onclick = () => {
-        if(!running){
-          running = true; start = Date.now(); btnSpan.textContent = 'Pausar';
-          stopwatchTimer = setInterval(()=>{ disp.textContent = fmt(elapsed + (Date.now()-start)); }, 31);
-        } else {
-          running = false; elapsed += Date.now()-start;
-          clearInterval(stopwatchTimer); stopwatchTimer = null;
-          btnSpan.textContent = 'Continuar';
-        }
-      };
-      reset.onclick = () => {
-        running = false; elapsed = 0;
-        clearInterval(stopwatchTimer); stopwatchTimer = null;
-        disp.textContent = '00:00:00.000'; btnSpan.textContent = 'Iniciar';
-      }; break;
-    }
-    case 'notes': {
-      const inp = document.getElementById('notesInput');
-      const st  = document.getElementById('notesStatus');
-      inp.value = localStorage.getItem('minitools_notes') || '';
-      inp.addEventListener('input', () => {
-        localStorage.setItem('minitools_notes', inp.value);
-        st.textContent = '✓ Guardado';
-        clearTimeout(st._t);
-        st._t = setTimeout(()=> st.textContent = '', 1200);
-      }); break;
-    }
-  }
-}
-
-/* ============ UTILIDAD COLOR ============ */
-function rgbToHsl(r,g,b){
-  r/=255; g/=255; b/=255;
-  const max = Math.max(r,g,b), min = Math.min(r,g,b);
-  let h, s, l = (max+min)/2;
-  if(max === min){ h = s = 0; }
-  else {
-    const d = max-min;
-    s = l>0.5 ? d/(2-max-min) : d/(max+min);
-    switch(max){
-      case r: h = (g-b)/d + (g<b?6:0); break;
-      case g: h = (b-r)/d + 2; break;
-      default: h = (r-g)/d + 4;
-    }
-    h /= 6;
-  }
-  return [Math.round(h*360), Math.round(s*100), Math.round(l*100)];
-}
 </script>
 </body>
 </html>
